@@ -20,7 +20,7 @@ const { specs, swaggerUi } = require('./swagger');
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 
 // homepage route to confirm server running
-app.get('/', (response) => {
+app.get('/', (request, response) => {
     response.json({
         message: 'Hello, world!',
     });
