@@ -8,7 +8,7 @@ let databaseUrl =
 
 async function dbConnect() {
     try {
-        console.log('Connecting to: ', databaseUrl);
+        // console.log('Connecting to: ', databaseUrl); 
         await mongoose.connect(databaseUrl);
         console.log('Connected to DB');
     } catch (error) {
