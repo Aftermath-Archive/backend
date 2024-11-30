@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+require('dotenv').config();
+
 
 let databaseUrl =
     process.env.DATABASE_URL ||
@@ -6,6 +8,7 @@ let databaseUrl =
 
 async function dbConnect() {
     try {
+        console.log('Connecting to: ', databaseUrl);
         await mongoose.connect(databaseUrl);
         console.log('Connected to DB');
     } catch (error) {
@@ -17,7 +20,13 @@ async function dbDisconnect() {
     await mongoose.connection.close();
 }
 
+
+async function dbDrop() {
+    await mongoose.connection.db.dropDatabase();
+}
+
 module.exports = {
     dbConnect,
     dbDisconnect,
+    dbDrop
 };
