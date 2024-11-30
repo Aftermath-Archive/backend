@@ -1,9 +1,9 @@
 const mongoose = require('mongoose');
 
 const UserSchema = new mongoose.Schema(
-    {   
+    {
         // Mongoose automatically creates indexes for unique fields for performance
-        
+
         username: {
             type: String,
             required: [true, 'Username is required'],
@@ -61,7 +61,7 @@ const UserSchema = new mongoose.Schema(
             type: Date,
             default: null,
         },
-        //  these fields allow us to delete users, but keep their data in the database 
+        //  these fields allow us to delete users, but keep their data in the database
         isActive: {
             type: Boolean,
             default: true,
@@ -71,7 +71,7 @@ const UserSchema = new mongoose.Schema(
             default: null,
         },
     },
-    { timestamps: true }
+    { timestamps: true } // automatically adds createdAt and updatedAt fields
 );
 
 const User = mongoose.model('User', UserSchema);
