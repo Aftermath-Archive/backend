@@ -38,21 +38,15 @@ async function handleGetIncidentById(req, res) {
 // Handle fetching all incidents with pagination
 async function handleGetAllIncidents(req, res) {
     try {
-        const { page, limit, skip } = req.pagination;
+        const { page, limit } = req.pagination;
+        
+        // Use the pagination parameters directly in the service call
+        const incidents = await findIncidentsByQueryService(
+            {}, // empty query to get all incidents
+            { page, limit }
+        );
 
-        // Get all incidents from the service
-        const allIncidents = await findIncidentsByQueryService({});
-
-        // Apply pagination manually
-        const incidents = allIncidents.slice(skip, skip + limit);
-        const total = allIncidents.length;
-
-        res.status(200).json({
-            total,
-            page,
-            limit,
-            incidents,
-        });
+        res.status(200).json(incidents);
     } catch (error) {
         logError('Fetching all incidents with pagination', error);
         res.status(400).json({ message: error.message });
