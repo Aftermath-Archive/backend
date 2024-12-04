@@ -1,5 +1,12 @@
 const { check, validationResult } = require('express-validator');
 
+
+/**
+ * Middleware function to validate an incident. It checks if the incident title and description are not empty, and the environment is one of Production, Staging, or Development. If validation fails, it returns a 400 error with the validation errors. If validation passes, it calls the next middleware function.
+ * @author Xander
+ *
+ * @type {{}}
+ */
 const validateIncidentMiddleware = [
     check('title').notEmpty().withMessage('Title is required.'),
     check('description').notEmpty().withMessage('Description is required.'),
