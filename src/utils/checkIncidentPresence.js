@@ -1,4 +1,5 @@
-const { logError } = require('../functions/logError');
+const logError = require('../functions/logError');
+
 
 /**
  * Checks if a document exists in the database based on a provided query.
@@ -27,3 +28,4 @@ async function checkIncidentPresence(
 }
 
 module.exports = checkIncidentPresence;
+

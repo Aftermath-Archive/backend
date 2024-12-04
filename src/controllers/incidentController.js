@@ -1,3 +1,5 @@
+const logError = require('../functions/logError');
+
 const {
     createNewIncidentService,
     findIncidentByQueryService,
@@ -5,8 +7,6 @@ const {
     updateIncidentByQueryService,
     deleteIncidentByQueryService,
 } = require('../services/incidentService');
-
-const logError = require('../functions/logError');
 
 const checkIncidentPresence = require('../utils/checkIncidentPresence');
 
