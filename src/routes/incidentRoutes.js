@@ -15,6 +15,16 @@ router.post(
     incidentController.handleCreateIncident
 );
 
+// Get all incidents with pagination
+router.get('/', paginationMiddleware, incidentController.handleGetAllIncidents);
+
+// Search and filter incidents
+router.get(
+    '/search',
+    // paginationMiddleware,
+    incidentController.handleSearchIncidents
+);
+
 // Get Incident by ID
 router.get(
     '/:id',
@@ -22,21 +32,11 @@ router.get(
     incidentController.handleGetIncidentById
 );
 
-// Get all incidents with pagination
-router.get('/', paginationMiddleware, incidentController.handleGetAllIncidents);
-
-// Search and filter incidents
-router.get(
-    '/search',
-    paginationMiddleware,
-    incidentController.handleSearchIncidents
-);
-
 // Update incident by ID
 router.patch(
     '/:id',
     validateObjectIdMiddleware,
-    validateIncidentMiddleware,
+    // validateIncidentMiddleware,
     incidentController.handleUpdateIncident
 );
 
