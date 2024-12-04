@@ -5,22 +5,10 @@ const { Incident } = require('../models/incident');
 // Create a new incident
 async function createIncident(incidentData) {
     try {
-        // Validate required fields
-        if (
-            !incidentData.title ||
-            !incidentData.description ||
-            !incidentData.createdBy
-        ) {
-            throw new Error(
-                'Missing required fields: title, description, or createdBy.'
-            );
-        }
-
-        // Create the incident
         const result = await Incident.create({
             title: incidentData.title,
             description: incidentData.description,
-            environment: incidentData.environment, // Optional but must match allowed values - 'Production', 'Staging', 'Development'
+            environment: incidentData.environment,
             createdBy: incidentData.createdBy,
 
             // Optional fields with defaults
@@ -43,7 +31,7 @@ async function createIncident(incidentData) {
     }
 }
 
-// Find a single Incident by query
+// Find a single incident by query
 async function findOneIncident(query) {
     try {
         const result = await Incident.findOne(query);
@@ -59,11 +47,10 @@ async function findOneIncident(query) {
     }
 }
 
-// Find multiple Incidents by query
+// Find multiple incidents by query
 async function findManyIncidents(query) {
     try {
         const result = await Incident.find(query);
-
         return result;
     } catch (error) {
         console.error('Error finding incidents:', error);
@@ -71,7 +58,7 @@ async function findManyIncidents(query) {
     }
 }
 
-// Update a single Incident by query
+// Update a single incident by query
 async function updateOneIncident(query, updateData) {
     try {
         const result = await Incident.findOneAndUpdate(query, updateData, {
@@ -90,13 +77,12 @@ async function updateOneIncident(query, updateData) {
     }
 }
 
-// Update multiple Incidents by query
+// Update multiple incidents by query
 async function updateManyIncidents(query, updateData) {
     try {
         const result = await Incident.updateMany(query, updateData, {
             runValidators: true,
         });
-
         return result;
     } catch (error) {
         console.error('Error updating multiple incidents:', error);
@@ -104,7 +90,7 @@ async function updateManyIncidents(query, updateData) {
     }
 }
 
-// Delete a single Incident by query
+// Delete a single incident by query
 async function deleteOneIncident(query) {
     try {
         const result = await Incident.findOneAndDelete(query);
@@ -120,11 +106,10 @@ async function deleteOneIncident(query) {
     }
 }
 
-// Delete multiple Incidents by query
+// Delete multiple incidents by query
 async function deleteManyIncidents(query) {
     try {
         const result = await Incident.deleteMany(query);
-
         return result;
     } catch (error) {
         console.error('Error deleting multiple incidents:', error);
@@ -132,6 +117,7 @@ async function deleteManyIncidents(query) {
     }
 }
 
+// Export CRUD operations
 module.exports = {
     createIncident,
     findOneIncident,
