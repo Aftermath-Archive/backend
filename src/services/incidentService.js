@@ -50,8 +50,51 @@ async function findIncidentByQueryService(query) {
 // Find multiple incidents by query
 async function findIncidentsByQueryService(query) {
     try {
-        const result = await Incident.find(query);
-        return result;
+        console.log('Received Query Parameters:', query);
+        const validQuery = {};
+
+        // search by title, description, status, environment, tags, or severity
+        if (query.title) {
+            validQuery.title = { $regex: query.title, $options: 'i' }; // Partial, case-insensitive match
+        }
+
+        if (query.description) {
+            validQuery.description = {
+                $regex: query.description,
+                $options: 'i',
+            }; // Partial, case-insensitive match
+        }
+
+        if (query.status) {
+            validQuery.status = query.status; // Exact match
+        }
+
+        if (query.environment) {
+            validQuery.environment = query.environment; // Exact match
+        }
+
+        if (query.tags) {
+            validQuery.tags = { $in: query.tags.split(',') }; // Match any tag in the array
+        }
+
+        if (query.severity) {
+            validQuery.severity = query.severity; // Exact match
+        }
+
+        // global search
+        if (query.search) {
+            const searchRegex = { $regex: query.search, $options: 'i' };
+            validQuery.$or = [
+                { title: searchRegex },
+                { description: searchRegex },
+                { tags: searchRegex },
+                { severity: searchRegex },
+                { environment: searchRegex },
+            ];
+        }
+        console.log('Constructed Query:', validQuery);
+
+        return Incident.find(validQuery);
     } catch (error) {
         console.error('Error finding incidents:', error);
         throw new Error('Failed to find incidents.');
