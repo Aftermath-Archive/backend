@@ -67,3 +67,4 @@ describe('handleCreateIncident', () => {
         expect(mockRes.json).toHaveBeenCalledWith({ message: errorMessage });
     });
 });
+
