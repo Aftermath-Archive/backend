@@ -6,8 +6,9 @@ const {
     deleteIncidentByQueryService,
 } = require('../services/incidentService');
 
-const { logError } = require('../functions/logError');
-const { checkIncidentPresence } = require('../utils/checkIncidentPresence');
+const logError = require('../functions/logError');
+
+const checkIncidentPresence = require('../utils/checkIncidentPresence');
 
 // Handle creation of a new incident
 async function handleCreateIncident(req, res) {
@@ -38,10 +39,13 @@ async function handleGetIncidentById(req, res) {
 async function handleGetAllIncidents(req, res) {
     try {
         const { page, limit, skip } = req.pagination;
-        const incidents = await findIncidentsByQueryService({})
-            .skip(skip)
-            .limit(limit);
-        const total = await findIncidentsByQueryService({}).countDocuments();
+
+        // Get all incidents from the service
+        const allIncidents = await findIncidentsByQueryService({});
+
+        // Apply pagination manually
+        const incidents = allIncidents.slice(skip, skip + limit);
+        const total = allIncidents.length;
 
         res.status(200).json({
             total,

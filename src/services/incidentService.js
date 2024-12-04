@@ -1,6 +1,6 @@
 // Provide CRUD operations for incidents
 
-const { Incident } = require('../models/incident');
+const { Incident } = require('../models/incidentModel');
 
 // Create a new incident
 async function createNewIncidentService(incidentData) {
