@@ -1,6 +1,6 @@
 const { check, validationResult } = require('express-validator');
 
-const validateIncident = [
+const validateIncidentMiddleware = [
     check('title').notEmpty().withMessage('Title is required.'),
     check('description').notEmpty().withMessage('Description is required.'),
     check('environment')
@@ -17,4 +17,4 @@ const validateIncident = [
     },
 ];
 
-module.exports = validateIncident;
+module.exports = validateIncidentMiddleware;
