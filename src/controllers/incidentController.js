@@ -1,12 +1,18 @@
-const { Incident } = require('../models/incidentModel');
+const {
+    createNewIncidentService,
+    findIncidentByQueryService,
+    findIncidentsByQueryService,
+    updateIncidentByQueryService,
+    deleteIncidentByQueryService,
+} = require('../services/incidentService');
 
 const { logError } = require('../functions/logError');
 const { checkIncidentPresence } = require('../utils/checkIncidentPresence');
 
-// Create a new incident
-async function incidentCreate(req, res) {
+// Handle creation of a new incident
+async function handleCreateIncident(req, res) {
     try {
-        const incident = await Incident.createIncident(req.body);
+        const incident = await createNewIncidentService(req.body);
         res.status(201).json(incident);
     } catch (error) {
         logError('Creating incident', error);
@@ -14,10 +20,10 @@ async function incidentCreate(req, res) {
     }
 }
 
-// Get Incident by ID
-async function incidentFindOne(req, res) {
+// Handle fetching an incident by ID
+async function handleGetIncidentById(req, res) {
     try {
-        const incident = await checkIncidentPresence(Incident, {
+        const incident = await findIncidentByQueryService({
             _id: req.params.id,
         });
         res.status(200).json(incident);
@@ -28,12 +34,14 @@ async function incidentFindOne(req, res) {
     }
 }
 
-// Get all incidents with pagination
-async function incidentFindAll(req, res) {
+// Handle fetching all incidents with pagination
+async function handleGetAllIncidents(req, res) {
     try {
         const { page, limit, skip } = req.pagination;
-        const incidents = await Incident.find().skip(skip).limit(limit);
-        const total = await Incident.countDocuments();
+        const incidents = await findIncidentsByQueryService({})
+            .skip(skip)
+            .limit(limit);
+        const total = await findIncidentsByQueryService({}).countDocuments();
 
         res.status(200).json({
             total,
@@ -47,10 +55,10 @@ async function incidentFindAll(req, res) {
     }
 }
 
-// Find Many Incidents by query
-async function incidentFindMany(req, res) {
+// Handle searching incidents by query
+async function handleSearchIncidents(req, res) {
     try {
-        const incidents = await Incident.findManyIncidents(req.query);
+        const incidents = await findIncidentsByQueryService(req.query);
         res.status(200).json(incidents);
     } catch (error) {
         logError('Finding incidents by query', error);
@@ -58,16 +66,18 @@ async function incidentFindMany(req, res) {
     }
 }
 
-// update incident by ID
-async function incidentUpdateOne(req, res) {
+// Handle updating an incident by ID
+async function handleUpdateIncident(req, res) {
     try {
-        const incident = await checkIncidentPresence(Incident, {
-            _id: req.params.id,
-        });
-        const updatedIncident = await Incident.findOneAndUpdate(
+        const incident = await checkIncidentPresence(
+            findIncidentByQueryService,
+            {
+                _id: req.params.id,
+            }
+        );
+        const updatedIncident = await updateIncidentByQueryService(
             { _id: incident._id },
-            req.body,
-            { new: true, runValidators: true }
+            req.body
         );
         res.status(200).json(updatedIncident);
     } catch (error) {
@@ -77,13 +87,16 @@ async function incidentUpdateOne(req, res) {
     }
 }
 
-// delete incident by ID
-async function incidentDeleteOne(req, res) {
+// Handle deleting an incident by ID
+async function handleDeleteIncident(req, res) {
     try {
-        const incident = await checkIncidentPresence(Incident, {
-            _id: req.params.id,
-        });
-        const deletedIncident = await Incident.findOneAndDelete({
+        const incident = await checkIncidentPresence(
+            findIncidentByQueryService,
+            {
+                _id: req.params.id,
+            }
+        );
+        const deletedIncident = await deleteIncidentByQueryService({
             _id: incident._id,
         });
         res.status(200).json(deletedIncident);
@@ -94,8 +107,8 @@ async function incidentDeleteOne(req, res) {
     }
 }
 
-// add Case Discussion to incident
-async function incidentAddDiscussion(req, res) {
+// Handle adding a case discussion to an incident
+async function handleAddDiscussion(req, res) {
     try {
         const { message, author } = req.body;
 
@@ -105,14 +118,16 @@ async function incidentAddDiscussion(req, res) {
                 .json({ message: 'Message and author are required.' });
         }
 
-        const incident = await checkIncidentPresence(Incident, {
-            _id: req.params.id,
-        });
+        const incident = await checkIncidentPresence(
+            findIncidentByQueryService,
+            {
+                _id: req.params.id,
+            }
+        );
 
-        const updatedIncident = await Incident.findByIdAndUpdate(
-            incident._id,
-            { $push: { caseDiscussion: { message, author } } },
-            { new: true, runValidators: true }
+        const updatedIncident = await updateIncidentByQueryService(
+            { _id: incident._id },
+            { $push: { caseDiscussion: { message, author } } }
         );
 
         res.status(200).json(updatedIncident);
@@ -124,11 +139,11 @@ async function incidentAddDiscussion(req, res) {
 }
 
 module.exports = {
-    incidentCreate,
-    incidentFindOne,
-    incidentFindAll,
-    incidentFindMany,
-    incidentUpdateOne,
-    incidentDeleteOne,
-    incidentAddDiscussion,
+    handleCreateIncident,
+    handleGetIncidentById,
+    handleGetAllIncidents,
+    handleSearchIncidents,
+    handleUpdateIncident,
+    handleDeleteIncident,
+    handleAddDiscussion,
 };
