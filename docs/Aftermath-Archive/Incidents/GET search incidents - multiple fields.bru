@@ -1,0 +1,16 @@
+meta {
+  name: GET search incidents - multiple fields
+  type: http
+  seq: 9
+}
+
+get {
+  url: http://localhost:8080/incidents/search?title=Critical&severity=High
+  body: none
+  auth: none
+}
+
+params:query {
+  title: Critical
+  severity: High
+}
