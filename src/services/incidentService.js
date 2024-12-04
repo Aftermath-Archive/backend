@@ -3,7 +3,7 @@
 const { Incident } = require('../models/incident');
 
 // Create a new incident
-async function createIncident(incidentData) {
+async function createNewIncidentService(incidentData) {
     try {
         const result = await Incident.create({
             title: incidentData.title,
@@ -32,7 +32,7 @@ async function createIncident(incidentData) {
 }
 
 // Find a single incident by query
-async function findOneIncident(query) {
+async function findIncidentByQueryService(query) {
     try {
         const result = await Incident.findOne(query);
 
@@ -48,7 +48,7 @@ async function findOneIncident(query) {
 }
 
 // Find multiple incidents by query
-async function findManyIncidents(query) {
+async function findIncidentsByQueryService(query) {
     try {
         const result = await Incident.find(query);
         return result;
@@ -59,7 +59,7 @@ async function findManyIncidents(query) {
 }
 
 // Update a single incident by query
-async function updateOneIncident(query, updateData) {
+async function updateIncidentByQueryService(query, updateData) {
     try {
         const result = await Incident.findOneAndUpdate(query, updateData, {
             new: true, // Return the updated document
@@ -78,7 +78,7 @@ async function updateOneIncident(query, updateData) {
 }
 
 // Update multiple incidents by query
-async function updateManyIncidents(query, updateData) {
+async function updateManyIncidentsByQueryService(query, updateData) {
     try {
         const result = await Incident.updateMany(query, updateData, {
             runValidators: true,
@@ -91,7 +91,7 @@ async function updateManyIncidents(query, updateData) {
 }
 
 // Delete a single incident by query
-async function deleteOneIncident(query) {
+async function deleteIncidentByQueryService(query) {
     try {
         const result = await Incident.findOneAndDelete(query);
 
@@ -107,7 +107,7 @@ async function deleteOneIncident(query) {
 }
 
 // Delete multiple incidents by query
-async function deleteManyIncidents(query) {
+async function deleteManyIncidentsByQueryService(query) {
     try {
         const result = await Incident.deleteMany(query);
         return result;
@@ -119,11 +119,11 @@ async function deleteManyIncidents(query) {
 
 // Export CRUD operations
 module.exports = {
-    createIncident,
-    findOneIncident,
-    findManyIncidents,
-    updateOneIncident,
-    updateManyIncidents,
-    deleteOneIncident,
-    deleteManyIncidents,
+    createNewIncidentService,
+    findIncidentByQueryService,
+    findIncidentsByQueryService,
+    updateIncidentByQueryService,
+    updateManyIncidentsByQueryService,
+    deleteIncidentByQueryService,
+    deleteManyIncidentsByQueryService,
 };
