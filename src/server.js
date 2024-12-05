@@ -6,7 +6,7 @@ let corsOptions = {
     origin: [
         'http://localhost:3000', // CRA local
         'http://localhost:5173', // vite local
-        'https://deployedurl.netlify.app', // change later
+        'http://aftermath-archive.xyz/', // production
     ],
     optionsSuccessStatus: 200,
 };
@@ -25,6 +25,10 @@ app.get('/', (request, response) => {
         message: 'Hello, world!',
     });
 });
+
+// incident routes
+const incidentRoutes = require('./routes/incidentRoutes');
+app.use('/incidents', incidentRoutes);
 
 module.exports = {
     app,
