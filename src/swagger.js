@@ -15,6 +15,10 @@ const options = {
                 url: 'http://localhost:8080',
                 description: 'Local server',
             },
+            {
+                url: 'https://backend-1ggt.onrender.com',
+                description: 'Deployed server',
+            },
         ],
         components: {
             securitySchemes: {
