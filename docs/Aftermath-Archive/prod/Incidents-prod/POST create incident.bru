@@ -1,0 +1,41 @@
+meta {
+  name: POST create incident
+  type: http
+  seq: 1
+}
+
+post {
+  url: https://backend-1ggt.onrender.com/incidents/
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+      "title": "Critical network outage",
+      "description": "A major network outage occurred affecting all users.",
+      "environment": "Production",
+      "createdBy": "648a4e3fbbf1e5a8e0b8a123",
+      "status": "In Progress",
+      "assignedTo": "648a4e3fbbf1e5a8e0b8a124",
+      "updatedBy": "648a4e3fbbf1e5a8e0b8a125",
+      "resolvedAt": "2024-12-05T12:00:00Z",
+      "tags": ["network", "critical", "outage"],
+      "resolutionDetails": "Rebooted core network switches and restored services.",
+      "severity": "Critical",
+      "relatedLinks": ["http://statuspage.com/network-incident"],
+      "relatedIncidents": ["648a4e3fbbf1e5a8e0b8a126"],
+      "caseDiscussion": [
+          {
+              "message": "Initial report logged by network team.",
+              "author": "648a4e3fbbf1e5a8e0b8a123",
+              "timestamp": "2024-12-04T15:30:00Z"
+          },
+          {
+              "message": "Issue escalated to Level 3 support.",
+              "author": "648a4e3fbbf1e5a8e0b8a124",
+              "timestamp": "2024-12-04T16:00:00Z"
+          }
+      ]
+  }
+}

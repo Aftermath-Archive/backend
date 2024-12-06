@@ -1,0 +1,17 @@
+meta {
+  name: PATCH update incident by ID
+  type: http
+  seq: 4
+}
+
+patch {
+  url: https://backend-1ggt.onrender.com/incidents/674ff56e19ea4af0ea14e0f3
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+   "status": "Resolved" 
+  }
+}

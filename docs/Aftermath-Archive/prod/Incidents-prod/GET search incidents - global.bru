@@ -1,0 +1,15 @@
+meta {
+  name: GET search incidents - global
+  type: http
+  seq: 7
+}
+
+get {
+  url: https://backend-1ggt.onrender.com/incidents/search?search=Critical
+  body: none
+  auth: none
+}
+
+params:query {
+  search: Critical
+}

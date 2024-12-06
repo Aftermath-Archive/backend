@@ -1,0 +1,16 @@
+meta {
+  name: GET search incidents - multiple fields
+  type: http
+  seq: 9
+}
+
+get {
+  url: https://backend-1ggt.onrender.com/incidents/search?title=Critical&severity=High
+  body: none
+  auth: none
+}
+
+params:query {
+  title: Critical
+  severity: High
+}

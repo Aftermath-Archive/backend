@@ -1,0 +1,18 @@
+meta {
+  name: POST add discussion to incident by ID
+  type: http
+  seq: 6
+}
+
+post {
+  url: https://backend-1ggt.onrender.com/674acbe01ed6ec7ef38b8c31/discussion
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "message": "test message",
+    "author": "674acbdf1ed6ec7ef38b8c29"
+  }
+}
