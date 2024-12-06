@@ -1,4 +1,4 @@
-const logError = require('../functions/logError');
+const logError = require('../utils/logError');
 
 const {
     createNewIncidentService,

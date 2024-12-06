@@ -1,4 +1,4 @@
-const logError = require('../functions/logError');
+const logError = require('../utils/logError');
 
 /**
  * Checks if a document exists in the database based on a provided query.

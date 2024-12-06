@@ -22,7 +22,7 @@ const checkIncidentPresence = require('../utils/checkIncidentPresence');
 // Mock dependencies
 jest.mock('../services/incidentService');
 jest.mock('../utils/checkIncidentPresence');
-jest.mock('../functions/logError');
+jest.mock('../utils/logError');
 
 describe('Incident Controller', () => {
     let mockReq, mockRes;
