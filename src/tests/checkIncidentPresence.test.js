@@ -1,5 +1,6 @@
 const checkIncidentPresence = require('../utils/checkIncidentPresence');
 const logError = require('../utils/logError');
+// const AppError = require('../utils/AppError');
 
 jest.mock('../utils/logError');
 

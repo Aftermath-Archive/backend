@@ -1,4 +1,5 @@
 const logError = require('../utils/logError');
+const AppError = require('../utils/AppError');
 
 /**
  * Checks if a document exists in the database based on a provided query.
@@ -17,12 +18,12 @@ async function checkIncidentPresence(
     try {
         const incident = await serviceFunction(query);
         if (!incident) {
-            throw new Error(errorMessage);
+            throw new AppError(errorMessage);
         }
         return incident;
     } catch (error) {
         logError('Checking incident presence', error);
-        throw new Error(errorMessage);
+        throw new AppError(errorMessage);
     }
 }
 
