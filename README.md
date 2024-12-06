@@ -16,3 +16,8 @@ API endpoint documentation is [available here.](https://api.aftermath-archive.xy
 
 // TODO 
 - refactor checkIncidentPresence to middleware 
+
+
+// auth 
+https://www.passportjs.org/packages/passport-google-oauth20/
+https://www.passportjs.org/packages/passport-local/
