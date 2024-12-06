@@ -129,16 +129,25 @@ async function updateUserByQueryService(query, updateData) {
  */
 async function deleteUserByQueryService(query) {
     try {
-        const result = await User.findOneAndUpdate(query, {
-            isActive: false,
-            deletedAt: new Date(),
-        });
+        const result = await User.findOne(query);
 
         if (!result) {
             throw new AppError('No User found to delete.', 404);
         }
 
-        return result;
+        if (!result.isActive) {
+            throw new AppError('User is already deactivated.');
+        }
+
+        // Soft delete user
+        result.isActive = false;
+        result.deletedAt = new Date();
+        await result.save();
+
+        // Remove sensitive fields before returning
+        const safeUser = result.toObject();
+        delete safeUser.password;
+        return safeUser;
     } catch (error) {
         console.error(
             `Error deleting user with query: ${JSON.stringify(query)}`,
