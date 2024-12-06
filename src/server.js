@@ -30,6 +30,10 @@ app.get('/', (request, response) => {
 const incidentRoutes = require('./routes/incidentRoutes');
 app.use('/incidents', incidentRoutes);
 
+// user routes 
+const userRoutes = require('./routes/userRoutes');
+app.use('/users', userRoutes);
+
 module.exports = {
     app,
 };
