@@ -12,12 +12,12 @@ const options = {
         },
         servers: [
             {
-                url: 'http://localhost:8080',
-                description: 'Local server',
+                url: 'https://api.aftermath-archive.xyz',
+                description: 'Deployed server',
             },
             {
-                url: 'https://backend-1ggt.onrender.com',
-                description: 'Deployed server',
+                url: 'http://localhost:8080',
+                description: 'Development server',
             },
         ],
         components: {
