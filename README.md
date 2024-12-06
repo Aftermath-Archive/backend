@@ -12,3 +12,7 @@ It utilizes a MongoDB database, managed through MongoDB Atlas, to store and retr
 # API Documentation
 
 API endpoint documentation is [available here.](https://api.aftermath-archive.xyz/api-docs/)
+
+
+// TODO 
+- refactor checkIncidentPresence to middleware 

@@ -64,7 +64,6 @@ async function handleGetAllIncidents(req, res) {
     try {
         const { page, limit } = req.pagination;
 
-        // Use the pagination parameters directly in the service call
         const incidents = await findIncidentsByQueryService(
             {}, // empty query to get all incidents
             { page, limit }
