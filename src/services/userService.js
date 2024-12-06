@@ -79,9 +79,21 @@ async function findUserByQueryService(query, projection = { password: 0 }) {
     }
 }
 
+/**
+ * Updates a user based on the provided query by sanitizing the update data, excluding sensitive fields such as _id and password. Returns the updated user object. Throws an error if no user is found to update or if the update fails.
+ * @param query The query to find the user to update.
+ * @param updateData The data to update the user with.
+ * @returns The updated user object.
+ * @throws {AppError} If no user is found or if the update fails.
+ * @author Xander
+ *
+ * @async
+ * @param {*} query The query to find and update the user
+ * @param {*} updateData The data to update the user
+ * @returns {unknown} Updates a user in the database by the provided query and sanitized update data. Removes sensitive fields like '_id' and 'password' from the update data. Returns the updated user object. Throws an error if no user is found to update or if the update operation fails.
+ */
 async function updateUserByQueryService(query, updateData) {
     try {
-        
         // Remove sensitive fields from the updateData
         const sanitizedUpdateData = { ...updateData };
         delete sanitizedUpdateData._id;
@@ -107,6 +119,14 @@ async function updateUserByQueryService(query, updateData) {
     }
 }
 
+/**
+ * Deletes a user from the database based on the provided query. If the user is found, it is updated to set isActive to false and deletedAt to the current date. If no user is found, an AppError with status code 404 is thrown. If an error occurs during the deletion process, an AppError with status code 500 is thrown.
+ * @author Xander
+ *
+ * @async
+ * @param {*} query The query to find and delete the user
+ * @returns {unknown} Deletes a user in the database based on the provided query. Sets the 'isActive' field to false and 'deletedAt' field to the current date for the deleted user. Throws an AppError with status code 404 if no user is found for the given query. Throws an AppError with status code 500 if there is an error while deleting the user.
+ */
 async function deleteUserByQueryService(query) {
     try {
         const result = await User.findOneAndUpdate(query, {
