@@ -1,0 +1,15 @@
+meta {
+  name: GET search incidents - single field
+  type: http
+  seq: 8
+}
+
+get {
+  url: https://backend-1ggt.onrender.com/incidents/search?tags=network,security
+  body: none
+  auth: none
+}
+
+params:query {
+  tags: network,security
+}

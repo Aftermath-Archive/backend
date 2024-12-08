@@ -1,6 +1,7 @@
 // Provide CRUD operations for incidents
 
 const { Incident } = require('../models/incidentModel');
+const AppError = require('../utils/AppError');
 
 /**
  * Asynchronous function that creates a new incident with the provided incident data. It awaits the creation in the Incident model and returns the result. If an error occurs during the creation process, it logs the error and throws an error message indicating the failure to create the incident.
@@ -34,7 +35,7 @@ async function createNewIncidentService(incidentData) {
         return result;
     } catch (error) {
         console.error('Error creating incident:', error);
-        throw new Error('Failed to create incident.');
+        throw new AppError('Failed to create incident.');
     }
 }
 
@@ -51,13 +52,13 @@ async function findIncidentByQueryService(query) {
         const result = await Incident.findOne(query);
 
         if (!result) {
-            throw new Error('No incident found matching the query.');
+            throw new AppError('No incident found matching the query.');
         }
 
         return result;
     } catch (error) {
         console.error('Error finding incident:', error);
-        throw new Error('Failed to find incident.');
+        throw new AppError('Failed to find incident.');
     }
 }
 
@@ -118,7 +119,7 @@ async function findIncidentsByQueryService(query) {
         return Incident.find(validQuery);
     } catch (error) {
         console.error('Error finding incidents:', error);
-        throw new Error('Failed to find incidents.');
+        throw new AppError('Failed to find incidents.');
     }
 }
 
@@ -139,13 +140,13 @@ async function updateIncidentByQueryService(query, updateData) {
         });
 
         if (!result) {
-            throw new Error('No incident found to update.');
+            throw new AppError('No incident found to update.');
         }
 
         return result;
     } catch (error) {
         console.error('Error updating incident:', error);
-        throw new Error('Failed to update incident.');
+        throw new AppError('Failed to update incident.');
     }
 }
 
@@ -170,7 +171,7 @@ async function updateManyIncidentsByQueryService(query, updateData) {
         return result;
     } catch (error) {
         console.error('Error updating multiple incidents:', error);
-        throw new Error('Failed to update incidents.');
+        throw new AppError('Failed to update incidents.');
     }
 }
 
@@ -187,13 +188,13 @@ async function deleteIncidentByQueryService(query) {
         const result = await Incident.findOneAndDelete(query);
 
         if (!result) {
-            throw new Error('No incident found to delete.');
+            throw new AppError('No incident found to delete.');
         }
 
         return result;
     } catch (error) {
         console.error('Error deleting incident:', error);
-        throw new Error('Failed to delete incident.');
+        throw new AppError('Failed to delete incident.');
     }
 }
 
@@ -211,7 +212,7 @@ async function deleteManyIncidentsByQueryService(query) {
         return result;
     } catch (error) {
         console.error('Error deleting multiple incidents:', error);
-        throw new Error('Failed to delete incidents.');
+        throw new AppError('Failed to delete incidents.');
     }
 }
 

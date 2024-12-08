@@ -1,7 +1,8 @@
 const checkIncidentPresence = require('../utils/checkIncidentPresence');
-const logError = require('../functions/logError');
+const logError = require('../utils/logError');
+// const AppError = require('../utils/AppError');
 
-jest.mock('../functions/logError');
+jest.mock('../utils/logError');
 
 describe('checkIncidentPresence', () => {
     const mockServiceFunction = jest.fn();

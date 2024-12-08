@@ -14,10 +14,23 @@ let corsOptions = {
 // middleware setup
 app.use(express.json());
 app.use(cors(corsOptions));
+app.use(express.urlencoded({ extended: true }));
 
-// swagger init for documentation
+/**
+ * swagger configuration
+ */
 const { specs, swaggerUi } = require('./swagger');
+// swagger init
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
+
+/**
+ * passport configuration
+ */
+const passport = require('passport');
+require('./config/passport');
+
+// passport init
+app.use(passport.initialize());
 
 // homepage route to confirm server running
 app.get('/', (request, response) => {
@@ -26,9 +39,20 @@ app.get('/', (request, response) => {
     });
 });
 
+/**
+ * Import Routes
+ */
 // incident routes
 const incidentRoutes = require('./routes/incidentRoutes');
 app.use('/incidents', incidentRoutes);
+
+// auth routes
+const authRoutes = require('./routes/authRoutes');
+app.use('/auth', authRoutes);
+
+// user routes
+const userRoutes = require('./routes/userRoutes');
+app.use('/users', userRoutes);
 
 module.exports = {
     app,

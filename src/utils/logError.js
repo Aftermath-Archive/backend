@@ -11,6 +11,8 @@ function logError(action, error) {
     if (error.stack) {
         console.error(error.stack);
     }
+
+    // TODO - Log the error to a file or external logging service (Sentry)
 }
 
 module.exports = logError;
