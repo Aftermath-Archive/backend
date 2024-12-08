@@ -6,42 +6,6 @@ const validateUserExistsMiddleware = require('../middlewares/validateUserExistsM
 const userController = require('../controllers/userController');
 const paginationMiddleware = require('../middlewares/paginationMiddleware');
 
-/**
- * @swagger
- * /users:
- *   post:
- *     summary: Create a new user
- *     description: Create a new user with username, email, and password.
- *     tags: [Users]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - username
- *               - email
- *               - password
- *             properties:
- *               username:
- *                 type: string
- *                 description: The username for the new user.
- *               email:
- *                 type: string
- *                 format: email
- *                 description: The email of the new user.
- *               password:
- *                 type: string
- *                 format: password
- *                 description: The password for the new user.
- *     responses:
- *       201:
- *         description: User created successfully.
- *       400:
- *         description: Bad request.
- */
-router.post('/', userController.handleCreateUser);
 
 /**
  * @swagger

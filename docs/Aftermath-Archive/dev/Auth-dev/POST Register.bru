@@ -1,0 +1,19 @@
+meta {
+  name: POST Register
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:8080/auth/register
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "test1@email.com",
+    "username": "example-user-name",
+    "password": "Password123!"
+  }
+}
