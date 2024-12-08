@@ -1,36 +1,13 @@
 const logError = require('../utils/logError');
 
 const {
-    createNewUserService,
-    findUserByQueryService,
     updateUserByQueryService,
     deleteUserByQueryService,
+    findAllUsersService,
 } = require('../services/userService');
 
-
-
 /**
- * Asynchronously handles the creation of a user by calling the createNewUserService with the request body. If successful, it responds with a status of 201 and the created user. If an error occurs, it logs the error as 'Creating user' and responds with a status of 400 and an error message.
- * @author Xander
- *
- * @async
- * @param {*} req The request object containing user information
- * @param {*} res The response object for sending the user data
- * @returns {*} Handles the request to create a new user asynchronously. It calls the createNewUserService function with the request body to create a new user. If successful, it responds with status 201 and the created user JSON. If an error occurs, it logs the error and responds with status 400 and an error message JSON.
- */
-async function handleCreateUser(req, res) {
-    try {
-        const user = await createNewUserService(req.body);
-        res.status(201).json(user);
-    } catch (error) {
-        logError('Creating user', error);
-        res.status(400).json({ message: error.message });
-    }
-}
-
-
-/**
- * Handles the GET request to retrieve all users with pagination. Retrieves the page and limit from the request pagination object. Calls the findUserByQueryService function with an empty query to get all users based on the given page and limit. If successful, responds with status 200 and returns the users in JSON format. If an error occurs, logs the error message and responds with status 400 along with an error message in JSON format.
+ * Handles the GET request to retrieve all users with pagination. Retrieves the page and limit from the request pagination object. Calls the findAllUsersService function with an empty query to get all users based on the given page and limit. If successful, responds with status 200 and returns the users in JSON format. If an error occurs, logs the error message and responds with status 400 along with an error message in JSON format.
  * @author Xander
  *
  * @async
@@ -42,7 +19,7 @@ async function handleGetAllUsers(req, res) {
     try {
         const { page, limit } = req.pagination;
 
-        const users = await findUserByQueryService(
+        const users = await findAllUsersService(
             {}, // empty query to get all Users
             { page, limit }
         );
@@ -53,7 +30,6 @@ async function handleGetAllUsers(req, res) {
         res.status(400).json({ status: 'error', message: error.message });
     }
 }
-
 
 /**
  * Asynchronously handles the GET request to retrieve a user by their ID. The user must be validated and already added to the request object by the validateUserExists middleware. If successful, responds with status code 200 and the user data in JSON format. If an error occurs, logs the error as 'Finding user by ID', sets the response status to 500, and returns a JSON object with an error message 'Internal server error'.
@@ -76,7 +52,6 @@ async function handleGetUserById(req, res) {
         });
     }
 }
-
 
 /**
  * Asynchronous function that handles updating a user. The user to be updated is already validated and added to the request object in the validateUserExists middleware. It updates the user by querying the database using the user's ID from the request object. If successful, it responds with the updated user data in JSON format with status code 200. If an error occurs during the update process, it logs the error using the logError function and responds with a status code of 500 along with an error message in JSON format.
@@ -104,7 +79,6 @@ async function handleUpdateUser(req, res) {
     }
 }
 
-
 /**
  * Handles the deletion of a user by ID. The user to be deleted is already validated and added to the request object (req) by the validateUserExists middleware. If successful, responds with a status of 200 and JSON data of the deleted user. If an error occurs during the deletion process, logs the error and responds with a status of 500 along with an error message.
  * @author Xander
@@ -131,7 +105,6 @@ async function handleDeleteUser(req, res) {
 }
 
 module.exports = {
-    handleCreateUser,
     handleGetAllUsers,
     handleGetUserById,
     handleUpdateUser,
