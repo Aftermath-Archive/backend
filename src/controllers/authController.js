@@ -53,6 +53,10 @@ async function handleLoginUser(req, res) {
             return res.status(400).json({ message: 'Incorrect password' });
         }
 
+        // Update the lastLogin field to the current date and time for audit purposes
+        user.lastLogin = new Date();
+        await user.save();
+
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET_KEY, {
             expiresIn: '24h',
         });
@@ -63,7 +67,6 @@ async function handleLoginUser(req, res) {
         res.status(500).json({ message: 'Internal server error' });
     }
 }
-
 /**
  * Handles the logout action for the user. It logs out the user by calling req.logout and sends a success or failure message based on the result.
  * @author Xander
@@ -74,7 +77,7 @@ async function handleLoginUser(req, res) {
  * @returns {*} Handles user logout by calling req.logout and responds with success or error messages
  */
 async function handleLogoutUser(req, res) {
-    res.status(200).json({ message: 'Logged out successfully' });   
+    res.status(200).json({ message: 'Logged out successfully' });
 }
 
 module.exports = {
