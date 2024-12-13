@@ -46,7 +46,7 @@ async function createNewIncidentService(incidentData) {
             affectedSystems: incidentData.affectedSystems || '',
             impactSummary: incidentData.impactSummary || '',
             stepsToReproduce: incidentData.stepsToReproduce || '',
-            
+
             // Optional fields with defaults
             status: incidentData.status || 'Open',
             assignedTo: incidentData.assignedTo || null,
