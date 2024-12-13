@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 
-
 /**
  * Define the schema for Incidents in the system. It includes core details such as title, description, date created, environment, createdBy, update section status, assignedTo, updatedBy, resolvedAt, tags for categorization, resolution details, severity level, references relatedLinks, relatedIncidents, case discussion section with message, author, and timestamp. Includes validation and default values.
  * @author Xander
@@ -15,15 +14,16 @@ const IncidentSchema = new mongoose.Schema(
             required: true,
             trim: true,
         },
+        incidentAutoId: {
+            type: String,
+            unique: true,
+            required: true,
+        },
         description: {
             type: String,
             required: true,
             trim: true,
             maxlength: 1000,
-        },
-        dateCreated: {
-            type: Date,
-            default: Date.now,
         },
         environment: {
             type: String,
@@ -86,6 +86,7 @@ const IncidentSchema = new mongoose.Schema(
             type: [String],
             default: [],
         },
+
         relatedIncidents: {
             type: [mongoose.Schema.Types.ObjectId],
             ref: 'Incident',
