@@ -1,0 +1,19 @@
+meta {
+  name: POST Register-prod
+  type: http
+  seq: 1
+}
+
+post {
+  url: https://backend-1ggt.onrender.com/auth/register
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "test1@email.com",
+    "username": "example-user-name",
+    "password": "Password123!"
+  }
+}

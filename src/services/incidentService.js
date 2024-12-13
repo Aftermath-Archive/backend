@@ -13,11 +13,34 @@ const AppError = require('../utils/AppError');
  */
 async function createNewIncidentService(incidentData) {
     try {
-        const result = await Incident.create({
+        // For incidentAutoId
+        // Generate date prefix (e.g., '121123' for December 11, 2023)
+        const now = new Date();
+        const datePrefix = `${String(now.getMonth() + 1).padStart(
+            2,
+            '0'
+        )}${String(now.getDate()).padStart(2, '0')}${String(
+            now.getFullYear()
+        ).slice(-2)}`;
+
+        // Count the incidents created today to determine the next number
+        const count = await Incident.countDocuments({
+            incidentAutoId: { $regex: `^${datePrefix}-INC` },
+        });
+
+        // Create the new incident ID (e.g., '121123-INC001')
+        const incidentAutoId = `${datePrefix}-INC${String(count + 1).padStart(
+            3,
+            '0'
+        )}`;
+
+        // Create the new incident with the generated incidentAutoId
+        const newIncident = await Incident.create({
             title: incidentData.title,
             description: incidentData.description,
             environment: incidentData.environment,
             createdBy: incidentData.createdBy,
+            incidentAutoId,
 
             // Optional fields with defaults
             status: incidentData.status || 'Open',
@@ -32,10 +55,10 @@ async function createNewIncidentService(incidentData) {
             caseDiscussion: incidentData.caseDiscussion || [],
         });
 
-        return result;
+        return newIncident;
     } catch (error) {
         console.error('Error creating incident:', error);
-        throw new AppError('Failed to create incident.');
+        throw new AppError('Failed to create incident.', 500);
     }
 }
 
