@@ -59,17 +59,39 @@ const IncidentSchema = new mongoose.Schema(
             trim: true,
             maxlength: 1000,
         },
+        assignedTo: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+            default: null,
+        },
+
+        // References
+        // Tags for Categorization
+        tags: {
+            type: [String],
+            default: [],
+            validate: {
+                validator: (tags) => tags.length <= 10,
+                message: 'You can only add up to 10 tags.',
+            },
+        },
+
+        relatedLinks: {
+            type: [String],
+            default: [],
+        },
+
+        relatedIncidents: {
+            type: [mongoose.Schema.Types.ObjectId],
+            ref: 'Incident',
+            default: [],
+        },
 
         // Update Section
         status: {
             type: String,
             enum: ['Open', 'In Progress', 'Resolved', 'Closed'],
             default: 'Open',
-        },
-        assignedTo: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'User',
-            default: null,
         },
         updatedBy: {
             type: mongoose.Schema.Types.ObjectId,
@@ -81,33 +103,10 @@ const IncidentSchema = new mongoose.Schema(
             default: null,
         },
 
-        // Tags for Categorization
-        tags: {
-            type: [String],
-            default: [],
-            validate: {
-                validator: (tags) => tags.length <= 10,
-                message: 'You can only add up to 10 tags.',
-            },
-        },
-
-        // Conditional Fields for Resolution
         resolutionDetails: {
             type: String,
             default: '',
             maxlength: 1000,
-        },
-
-        // References
-        relatedLinks: {
-            type: [String],
-            default: [],
-        },
-
-        relatedIncidents: {
-            type: [mongoose.Schema.Types.ObjectId],
-            ref: 'Incident',
-            default: [],
         },
 
         // Case Discussion section

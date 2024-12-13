@@ -15,6 +15,7 @@ async function seedIncidents() {
         // Incident 1 - Production Server Outage
         {
             title: 'Production Server Outage',
+            incidentAutoId: 'INC-2021-0001',
             description:
                 'Critical issue with the production server causing downtime.',
             environment: 'Production',
@@ -40,6 +41,7 @@ async function seedIncidents() {
         // Incident 2 - Staging API Response Delay
         {
             title: 'Staging API Response Delay',
+            incidentAutoId: 'INC-2021-0002',
             description:
                 'The staging API is experiencing delays in response times, affecting testing.',
             environment: 'Staging',

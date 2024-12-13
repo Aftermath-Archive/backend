@@ -21,7 +21,11 @@ const checkIncidentPresence = require('../utils/checkIncidentPresence');
  */
 async function handleCreateIncident(req, res) {
     try {
-        const incident = await createNewIncidentService(req.body);
+        const incidentData = {
+            ...req.body,
+            createdBy: req.userId, // Set the createdBy field using the user ID from the token
+        };
+        const incident = await createNewIncidentService(incidentData);
         res.status(201).json(incident);
     } catch (error) {
         logError('Creating incident', error);
