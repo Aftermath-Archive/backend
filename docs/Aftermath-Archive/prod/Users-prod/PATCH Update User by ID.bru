@@ -1,0 +1,17 @@
+meta {
+  name: PATCH Update User by ID
+  type: http
+  seq: 3
+}
+
+patch {
+  url: https://backend-1ggt.onrender.com/users/6755416d7ae452ac0acf94e7
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "role": "TeamMember"
+  }
+}
