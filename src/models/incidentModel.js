@@ -25,6 +25,11 @@ const IncidentSchema = new mongoose.Schema(
             trim: true,
             maxlength: 1000,
         },
+        severity: {
+            type: String,
+            enum: ['Low', 'Medium', 'High', 'Critical'],
+            default: 'Low',
+        },
         environment: {
             type: String,
             enum: ['Production', 'Staging', 'Development'],
@@ -34,6 +39,25 @@ const IncidentSchema = new mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref: 'User',
             required: true,
+        },
+
+        // Scope
+        affectedSystems: {
+            type: String,
+            trim: true,
+            maxlength: 1000,
+        },
+
+        impactSummary: {
+            type: String,
+            trim: true,
+            maxlength: 1000,
+        },
+
+        stepsToReproduce: {
+            type: String,
+            trim: true,
+            maxlength: 1000,
         },
 
         // Update Section
@@ -72,13 +96,6 @@ const IncidentSchema = new mongoose.Schema(
             type: String,
             default: '',
             maxlength: 1000,
-        },
-
-        // Severity Level
-        severity: {
-            type: String,
-            enum: ['Low', 'Medium', 'High', 'Critical'],
-            default: 'Low',
         },
 
         // References

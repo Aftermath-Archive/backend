@@ -37,11 +37,16 @@ async function createNewIncidentService(incidentData) {
         // Create the new incident with the generated incidentAutoId
         const newIncident = await Incident.create({
             title: incidentData.title,
+            incidentAutoId,
             description: incidentData.description,
+            severity: incidentData.severity || 'Low',
             environment: incidentData.environment,
             createdBy: incidentData.createdBy,
-            incidentAutoId,
 
+            affectedSystems: incidentData.affectedSystems || '',
+            impactSummary: incidentData.impactSummary || '',
+            stepsToReproduce: incidentData.stepsToReproduce || '',
+            
             // Optional fields with defaults
             status: incidentData.status || 'Open',
             assignedTo: incidentData.assignedTo || null,
@@ -49,7 +54,6 @@ async function createNewIncidentService(incidentData) {
             resolvedAt: incidentData.resolvedAt || null,
             tags: incidentData.tags || [],
             resolutionDetails: incidentData.resolutionDetails || '',
-            severity: incidentData.severity || 'Low',
             relatedLinks: incidentData.relatedLinks || [],
             relatedIncidents: incidentData.relatedIncidents || [],
             caseDiscussion: incidentData.caseDiscussion || [],
