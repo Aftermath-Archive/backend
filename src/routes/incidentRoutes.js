@@ -7,6 +7,7 @@ const validateIncidentMiddleware = require('../middlewares/validateIncidentMiddl
 const validateDiscussionMiddleware = require('../middlewares/validateDiscussionMiddleware');
 const paginationMiddleware = require('../middlewares/paginationMiddleware');
 const validateObjectIdMiddleware = require('../middlewares/validateObjectIdMiddleware');
+const verifyTokenMiddleware = require('../middlewares/verifyTokenMiddleware');
 
 /**
  * @swagger
@@ -40,6 +41,7 @@ const validateObjectIdMiddleware = require('../middlewares/validateObjectIdMiddl
  */
 router.post(
     '/',
+    verifyTokenMiddleware,
     validateIncidentMiddleware,
     incidentController.handleCreateIncident
 );

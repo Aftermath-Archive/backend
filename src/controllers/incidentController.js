@@ -9,6 +9,7 @@ const {
 } = require('../services/incidentService');
 
 const checkIncidentPresence = require('../utils/checkIncidentPresence');
+const { decodeJWT } = require('../functions/jwtFunctions');
 
 /**
  * Handle creation of a new incident function. It receives a request object and a response object. It tries to create a new incident using the createNewIncidentService function with the request body. If successful, it responds with status code 201 and the incident object in JSON format. If an error occurs, it logs the error and responds with status code 400 and an error message in JSON format.
@@ -21,7 +22,11 @@ const checkIncidentPresence = require('../utils/checkIncidentPresence');
  */
 async function handleCreateIncident(req, res) {
     try {
-        const incident = await createNewIncidentService(req.body);
+        const incidentData = {
+            ...req.body,
+            createdBy: req.userId, // Set the createdBy field using the user ID from the token
+        };
+        const incident = await createNewIncidentService(incidentData);
         res.status(201).json(incident);
     } catch (error) {
         logError('Creating incident', error);
@@ -166,14 +171,26 @@ async function handleDeleteIncident(req, res) {
  */
 async function handleAddDiscussion(req, res) {
     try {
-        const { message, author } = req.body;
+        const { message } = req.body;
 
-        if (!message || !author) {
+        // Decode the JWT from the authorization header
+        const token = req.headers.authorization?.split(' ')[1];
+        if (!token) {
             return res
-                .status(400)
-                .json({ message: 'Message and author are required.' });
+                .status(401)
+                .json({ message: 'Authorization token missing.' });
         }
 
+        const decoded = decodeJWT(token);
+        const id = decoded.id; // Extract user ID from the token
+
+        if (!message || !id) {
+            return res
+                .status(400)
+                .json({ message: 'Message and valid token are required.' });
+        }
+
+        // Check if the incident exists
         const incident = await checkIncidentPresence(
             findIncidentByQueryService,
             {
@@ -181,11 +198,11 @@ async function handleAddDiscussion(req, res) {
             }
         );
 
+        // Add the case discussion
         const updatedIncident = await updateIncidentByQueryService(
             { _id: incident._id },
-            { $push: { caseDiscussion: { message, author } } }
+            { $push: { caseDiscussion: { message, author: id } } }
         );
-
         res.status(200).json(updatedIncident);
     } catch (error) {
         logError('Adding case discussion to incident', error);

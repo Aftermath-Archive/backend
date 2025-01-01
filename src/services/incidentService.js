@@ -46,7 +46,7 @@ async function createNewIncidentService(incidentData) {
             affectedSystems: incidentData.affectedSystems || '',
             impactSummary: incidentData.impactSummary || '',
             stepsToReproduce: incidentData.stepsToReproduce || '',
-            
+
             // Optional fields with defaults
             status: incidentData.status || 'Open',
             assignedTo: incidentData.assignedTo || null,
@@ -99,7 +99,6 @@ async function findIncidentByQueryService(query) {
  */
 async function findIncidentsByQueryService(query) {
     try {
-        console.log('Received Query Parameters:', query);
         const validQuery = {};
 
         // search by title, description, status, environment, tags, or severity
@@ -141,7 +140,6 @@ async function findIncidentsByQueryService(query) {
                 { environment: searchRegex },
             ];
         }
-        console.log('Constructed Query:', validQuery);
 
         return Incident.find(validQuery);
     } catch (error) {
