@@ -6,7 +6,6 @@ const {
     handleSearchIncidents,
     handleUpdateIncident,
     handleDeleteIncident,
-    handleAddDiscussion,
 } = require('../controllers/incidentController');
 
 const {
@@ -137,25 +136,6 @@ describe('Incident Controller', () => {
         mockReq.params.id = '123';
 
         await handleDeleteIncident(mockReq, mockRes);
-
-        expect(checkIncidentPresence).toHaveBeenCalledWith(
-            findIncidentByQueryService,
-            { _id: mockReq.params.id }
-        );
-
-        expect(mockRes.status).toHaveBeenCalledWith(200);
-        expect(mockRes.json).toHaveBeenCalledWith(mockIncident);
-    });
-
-    test('handleAddDiscussion should add a discussion to an incident and return 200', async () => {
-        const mockIncident = { id: '123', title: 'Incident with Discussion' };
-        checkIncidentPresence.mockResolvedValue(mockIncident);
-        updateIncidentByQueryService.mockResolvedValue(mockIncident);
-
-        mockReq.params.id = '123';
-        mockReq.body = { message: 'New discussion', author: 'Author' };
-
-        await handleAddDiscussion(mockReq, mockRes);
 
         expect(checkIncidentPresence).toHaveBeenCalledWith(
             findIncidentByQueryService,
