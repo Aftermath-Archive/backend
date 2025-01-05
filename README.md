@@ -9,9 +9,92 @@ It utilizes a MongoDB database, managed through MongoDB Atlas, to store and retr
 -   Frontend URL: `aftermath-archive.xyz`
 -   Backend URL: `api.aftermath-archive.xyz`
 
+## Demo Deployment:
+
+https://aftermath-archive.xyz
+
+## Frontend Repo:
+
+https://github.com/Aftermath-Archive/frontend
+
 ## API Documentation
 
 API endpoint documentation is [available here.](https://api.aftermath-archive.xyz/api-docs/)
+
+## Deployment Guide
+
+This guide outlines the steps to deploy the backend of the Aftermath Archive application to a production environment. The backend is built using Node.js and Express, and it can be deployed to a cloud hosting provider such as AWS, Heroku, Render, or DigitalOcean.
+
+### Prerequisites
+
+1. Node.js: Ensure you have Node.js (version 16.x or higher) installed.
+2. Backend Source Code: Access to the GitHub repository containing the backend code.
+3. Cloud Hosting Account: An account with a hosting provider like Heroku, AWS, Render, or DigitalOcean.
+4. Database: Ensure your MongoDB database is accessible (e.g., MongoDB Atlas or a self-hosted MongoDB instance).
+5. Environment Variables: Have the necessary environment variables ready, such as database connection strings, JWT secrets, and API keys.
+
+### Steps to Deploy
+
+#### 1. Clone the Repository
+
+```
+git clone https://github.com/Aftermath-Archive/backend
+cd backend
+```
+
+#### 2. Install Dependencies
+
+Run the following command to install the required dependencies:
+
+```
+npm install
+```
+
+#### 3. Configure Environment Variables
+
+Create a .env file in the root directory based on the existing `.env.example` and define the required variables:
+
+```
+DATABASE_URL=your-mongodb-connection-string
+JWT_SECRET_KEY=your-jwt-secret
+```
+
+Note: Replace the placeholder values with actual values.
+
+#### 4. Test the Application Locally
+
+Start the backend server to ensure it works as expected:
+
+npm run start
+
+Visit `http://localhost:PORT` in your browser or use an API client like Postman or Bruno to test endpoints.
+
+### Steps for Deployment
+
+#### Option 1: Deploy to Render
+
+1. Create an account and log in to Render.
+2. Click New Web Service and connect your GitHub repository.
+3. Configure the service:
+
+    - Environment: Node.js
+    - Build Command: npm install
+    - Start Command: npm run start
+
+4. Add environment variables in the “Environment” section.
+5. Deploy the application. Render will build and start your backend automatically.
+
+### Common Issues and Solutions
+
+#### Database Connection Errors:
+
+-   Double-check the DATABASE_URL environment variable and ensure the database allows connections from the server.
+
+#### CORS Errors:
+
+-   Configure CORS in the server.js file.
+
+By following these steps, you will have a fully deployed and functional backend for the Aftermath Archive application.
 
 ## 🔐 Authentication with Passport.js
 
@@ -38,7 +121,3 @@ This enhancement would involve:
 3. Securely storing refresh tokens and invalidating them upon logout.
 
 This feature is beyond the current project scope but would improve scalability and security for production use.
-
-// TODO
-
--   refactor checkIncidentPresence to middleware
