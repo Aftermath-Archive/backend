@@ -7,6 +7,8 @@ let corsOptions = {
         'http://localhost:3000', // CRA local
         'http://localhost:5173', // vite local
         'http://aftermath-archive.xyz/', // production
+        'https://aftermath-archive.xyz/', // production - https
+
     ],
     optionsSuccessStatus: 200,
 };
