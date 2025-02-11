@@ -23,7 +23,7 @@ API endpoint documentation is [available here.](https://api.aftermath-archive.xy
 
 ## Coder Academy 
 
-For students, or teachers who are viewing this repo in the context of the Coder Academy final assignment I have created a separate branch 'project-submission' [available here.](https://github.com/Aftermath-Archive/backend/tree/feature/project-submission)
+For students, or teachers who are viewing this repo in the context of the Coder Academy final assignment I have created a separate branch 'project-submission' [available here.](https://github.com/Aftermath-Archive/backend/tree/project-submission)
 
 This branch captures the projects state at time of submission while future work is undergone on the project. 
 
