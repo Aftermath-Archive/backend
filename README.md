@@ -21,6 +21,12 @@ https://github.com/Aftermath-Archive/frontend
 
 API endpoint documentation is [available here.](https://api.aftermath-archive.xyz/api-docs/)
 
+## Coder Academy 
+
+For students, or teachers who are viewing this repo in the context of the Coder Academy final assignment I have created a separate branch 'project-submission' [available here.](https://github.com/Aftermath-Archive/backend/tree/project-submission)
+
+This branch captures the projects state at time of submission while future work is undergone on the project. 
+
 ## Deployment Guide
 
 This guide outlines the steps to deploy the backend of the Aftermath Archive application to a production environment. The backend is built using Node.js and Express, and it can be deployed to a cloud hosting provider such as AWS, Heroku, Render, or DigitalOcean.
