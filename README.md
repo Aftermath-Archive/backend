@@ -17,6 +17,9 @@ https://aftermath-archive.xyz
 
 https://github.com/Aftermath-Archive/frontend
 
+
+## Docker Compose Deployment Repo:
+https://github.com/Aftermath-Archive/docker-deployment
 ## API Documentation
 
 API endpoint documentation is [available here.](https://api.aftermath-archive.xyz/api-docs/)
@@ -90,11 +93,47 @@ Visit `http://localhost:PORT` in your browser or use an API client like Postman 
 4. Add environment variables in the “Environment” section.
 5. Deploy the application. Render will build and start your backend automatically.
 
+#### Option 2: Docker
+##### Prerequisites
+1. Confirm Docker Installed
+    Download available for [Docker for Mac, Windows, and Linux.](https://docs.docker.com/get-started/get-docker/) 
+
+2. Cloud Hosting (Optional)
+
+    If deploying to a cloud service, ensure you have an instance/server on platforms such as: 
+    - AWS EC2
+    - Azure Virtual Machine 
+    - Google Cloud Platform Compute Engine 
+    - Digital Ocean
+    - Render 
+    - Railway 
+    - etc 
+
+##### Deploy with Docker Image
+1. Build the Docker Image
+
+    Run the` following command in the root of the backend project:
+    ```
+    docker build -t aftermath-archive-backend .
+    ````
+
+2. Run the container locally
+
+    To test the container on your local machine, run:
+    ```
+    docker run --env-file .env -p 4000:4000 aftermath-archive-backend
+    ```
+    - `--env-file .env`: Loads the environment variables from .env.
+    - `-p 4000:4000`: Maps port 4000 of the container to 4000 on your local machine.
+
+#### Option 3: Docker Compose
+For easier setup, a `docker-compose.yml` file for both front and backend is [available here.](https://github.com/Aftermath-Archive/docker-deployment)
+
 ### Common Issues and Solutions
 
 #### Database Connection Errors:
 
--   Double-check the DATABASE_URL environment variable and ensure the database allows connections from the server.
+-   Double-check the `DATABASE_URL` environment variable and ensure the database allows connections from the server.
 
 #### CORS Errors:
 
