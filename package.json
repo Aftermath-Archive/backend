@@ -7,7 +7,7 @@
         "test": "jest",
         "start": "node src/index.js",
         "dev": "nodemon src/index.js",
-        "prepare": "husky install",
+        "prepare": "git rev-parse &>/dev/null && husky install || echo 'Not git repo skipping husky install'",
         "db:seed": "node src/db/seeds/seed.js",
         "db:drop": "node src/db/drop.js",
         "db:drop-and-seed": "npm run db:drop && npm run db:seed"
