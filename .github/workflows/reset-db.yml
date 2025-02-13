@@ -25,4 +25,4 @@ jobs:
       - name: Drop and Seed Database
         run: npm run db:drop-and-seed
         env:
-          MONGO_URI: ${{ secrets.DATABASE_URL }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
