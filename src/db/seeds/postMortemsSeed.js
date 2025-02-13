@@ -1,6 +1,6 @@
 const { User } = require('../../models/userModel');
 const { Incident } = require('../../models/incidentModel');
-const { PostMortem } = require('../../models/postMortemModel');
+const { PostMortem } = require('../../models/postmortemModel');
 
 async function seedPostMortems() {
     // Fetch seeded incidents and users
