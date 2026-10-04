@@ -6,6 +6,7 @@ const PostMortemSchema = new mongoose.Schema(
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Incident',
             required: true,
+            unique: true,
         },
         rootCause: {
             type: String,

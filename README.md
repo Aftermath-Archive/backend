@@ -24,6 +24,19 @@ https://github.com/Aftermath-Archive/docker-deployment
 
 API endpoint documentation is [available here.](https://api.aftermath-archive.xyz/api-docs/)
 
+For a local server, open `http://localhost:8080/api-docs/` (or use your configured `PORT`).
+
+### Post-mortem API
+
+The `feature/postmortem-api` branch provides creation, listing/search, retrieval,
+partial updates, and deletion at `/post-mortems`. Reads are public; writes require
+the existing JWT bearer token. Each incident can have one post-mortem.
+
+See the [post-mortem frontend integration guide](docs/post-mortems.md) for payloads,
+response shapes, filtering, validation, lifecycle rules, and the required unique
+index for existing databases. The current frontend has no post-mortem screens or
+API client; this guide defines the contract for implementing them.
+
 ## Coder Academy 
 
 For students, or teachers who are viewing this repo in the context of the Coder Academy final assignment I have created a separate branch 'project-submission' [available here.](https://github.com/Aftermath-Archive/backend/tree/project-submission)

@@ -2,6 +2,7 @@
 
 const { Incident } = require('../models/incidentModel');
 const AppError = require('../utils/AppError');
+const { deletePostMortemByIncidentId } = require('./postMortemService');
 
 /**
  * Asynchronous function that creates a new incident with the provided incident data. It awaits the creation in the Incident model and returns the result. If an error occurs during the creation process, it logs the error and throws an error message indicating the failure to create the incident.
@@ -216,9 +217,11 @@ async function deleteIncidentByQueryService(query) {
             throw new AppError('No incident found to delete.');
         }
 
+        await deletePostMortemByIncidentId(result._id);
         return result;
     } catch (error) {
         console.error('Error deleting incident:', error);
+        if (error.isOperational) throw error;
         throw new AppError('Failed to delete incident.');
     }
 }

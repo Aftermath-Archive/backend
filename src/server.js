@@ -23,7 +23,7 @@ app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', req.headers.origin); // Dynamically allow the requesting origin
     res.header(
         'Access-Control-Allow-Methods',
-        'GET, POST, PUT, DELETE, OPTIONS'
+        'GET, POST, PUT, PATCH, DELETE, OPTIONS'
     );
     res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     if (req.method === 'OPTIONS') {
@@ -61,6 +61,10 @@ app.get('/', (request, response) => {
 // incident routes
 const incidentRoutes = require('./routes/incidentRoutes');
 app.use('/incidents', incidentRoutes);
+
+// post-mortem routes
+const postMortemRoutes = require('./routes/postMortemRoutes');
+app.use('/post-mortems', postMortemRoutes);
 
 // auth routes
 const authRoutes = require('./routes/authRoutes');

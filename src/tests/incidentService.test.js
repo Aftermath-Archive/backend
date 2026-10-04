@@ -1,5 +1,7 @@
 // Mock model to prevent the actual MongoDB connection from being used
 jest.mock('../models/incidentModel');
+jest.mock('../services/postMortemService');
+const { deletePostMortemByIncidentId } = require('../services/postMortemService');
 
 // Import the mocked model for reference
 const { Incident } = require('../models/incidentModel');
@@ -81,7 +83,7 @@ describe('Incident Service', () => {
     });
 
     test('deleteIncidentByQueryService deletes an incident by query', async () => {
-        const mockIncident = { title: 'Deleted Incident' };
+        const mockIncident = { _id: 'incident-id', title: 'Deleted Incident' };
         Incident.findOneAndDelete.mockResolvedValue(mockIncident);
 
         const result = await deleteIncidentByQueryService({
@@ -91,5 +93,21 @@ describe('Incident Service', () => {
             title: 'Deleted Incident',
         });
         expect(result).toEqual(mockIncident);
+        expect(deletePostMortemByIncidentId).toHaveBeenCalledWith('incident-id');
+    });
+
+    test('deleting an absent incident does not delete a post-mortem', async () => {
+        Incident.findOneAndDelete.mockResolvedValue(null);
+        const consoleError = jest
+            .spyOn(console, 'error')
+            .mockImplementation(() => {});
+        try {
+            await expect(
+                deleteIncidentByQueryService({ _id: 'missing-id' })
+            ).rejects.toThrow('No incident found to delete.');
+            expect(deletePostMortemByIncidentId).not.toHaveBeenCalled();
+        } finally {
+            consoleError.mockRestore();
+        }
     });
 });

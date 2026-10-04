@@ -155,7 +155,9 @@ async function handleDeleteIncident(req, res) {
         res.status(200).json(deletedIncident);
     } catch (error) {
         logError('Deleting incident by ID', error);
-        const statusCode = error.message === 'Incident not found.' ? 404 : 400;
+        const statusCode =
+            error.statusCode ||
+            (error.message === 'Incident not found.' ? 404 : 400);
         res.status(statusCode).json({ message: error.message });
     }
 }
