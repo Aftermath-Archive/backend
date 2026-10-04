@@ -172,7 +172,7 @@ router.patch(
  * /incidents/{id}:
  *   delete:
  *     summary: Delete an incident
- *     description: Remove an incident from the system by its unique ID.
+ *     description: Remove an incident and its associated post-mortem from the system by its unique ID.
  *     tags: [Incidents]
  *     parameters:
  *       - in: path
