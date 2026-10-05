@@ -1,5 +1,18 @@
 # Aftermath Archive - backend
 
+## Aftermath 2.0 migration
+
+The canonical successor is [Aftermath 2.0](https://github.com/xdaybreakerx/aftermath-2.0).
+This repository's main history was imported into
+[`apps/api`](https://github.com/xdaybreakerx/aftermath-2.0/tree/main/apps/api)
+with original commit ancestry preserved. The
+[history import PR](https://github.com/xdaybreakerx/aftermath-2.0/pull/1)
+also preserves historical branches and pull-request heads.
+
+Live cutover is not yet verified. This repository remains a historical reference
+and rollback target during migration. See the
+[2.0 README](https://github.com/xdaybreakerx/aftermath-2.0#readme) for the monorepo layout and source links.
+
 Welcome to the backend API for Aftermath Archive, an Incident Management web application.
 
 This backend is hosted on Render and integrates with the frontend hosted on Netlify.
