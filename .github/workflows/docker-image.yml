@@ -39,6 +39,8 @@ jobs:
             - run: npm ci
             - run: npm run lint
             - run: npm test -- --runInBand --coverage=false
+            - name: Test security against disposable MongoDB
+              run: npm run test:integration
               env:
                   INTEGRATION_DATABASE_URL: mongodb://127.0.0.1:27017/aftermath_security_test
             - name: Build production image

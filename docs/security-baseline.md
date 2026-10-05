@@ -84,7 +84,8 @@ Run `npm run lint` and `npm test -- --runInBand --coverage=false` under Node 26.
 Unit/route tests exercise anonymous/member/admin/inactive accounts, forgery,
 operator/scalar attacks, safe DTOs, password changes/token invalidation, bounded
 pagination/literal search, CORS/Helmet/errors, rate limits and startup/tooling
-failures. Local tests skip real MongoDB unless explicitly configured.
+failures. The real-MongoDB suite uses Node’s built-in runner (`npm run test:integration`),
+avoiding Jest VM/driver compatibility problems. It skips unless explicitly configured.
 
 GitHub CI provides an ephemeral MongoDB 8.0 service at
 `INTEGRATION_DATABASE_URL=mongodb://127.0.0.1:27017/aftermath_security_test`.
