@@ -72,6 +72,23 @@ const validateUpdatePostMortemMiddleware = [
 
 /** Validate filters before pagination; ignore unsupported query parameters. */
 const validatePostMortemQueryMiddleware = [
+    (req, res, next) => {
+        // Express 5's simple parser leaves nested query syntax in the key.
+        const invalidKey = Object.keys(req.query).find((key) =>
+            ['[', ']', '.', '$'].some((character) => key.includes(character))
+        );
+        if (invalidKey !== undefined) {
+            return res.status(400).json({
+                errors: [{
+                    type: 'field',
+                    location: 'query',
+                    path: invalidKey,
+                    msg: 'Query parameters must use plain field names.',
+                }],
+            });
+        }
+        next();
+    },
     query('page')
         .optional()
         .isString()

@@ -221,7 +221,8 @@ router.delete(
  *                 description: The discussion message
  *               author:
  *                 type: string
- *                 description: The user ID of the author
+ *                 readOnly: true
+ *                 description: Derived from the authenticated user; any supplied value is ignored.
  *     responses:
  *       200:
  *         description: Discussion added successfully
@@ -232,6 +233,7 @@ router.delete(
  */
 router.post(
     '/:id/discussion',
+    verifyTokenMiddleware,
     validateObjectIdMiddleware,
     validateDiscussionMiddleware,
     incidentController.handleAddDiscussion

@@ -49,7 +49,7 @@ This guide outlines the steps to deploy the backend of the Aftermath Archive app
 
 ### Prerequisites
 
-1. Node.js: Ensure you have Node.js (version 16.x or higher) installed.
+1. Node.js: Ensure you have Node.js 26.x (use `nvm install` and `nvm use` with the included `.nvmrc`) installed.
 2. Backend Source Code: Access to the GitHub repository containing the backend code.
 3. Cloud Hosting Account: An account with a hosting provider like Heroku, AWS, Render, or DigitalOcean.
 4. Database: Ensure your MongoDB database is accessible (e.g., MongoDB Atlas or a self-hosted MongoDB instance).
@@ -88,6 +88,32 @@ Note: Replace the placeholder values with actual values.
 Start the backend server to ensure it works as expected:
 
 npm run start
+
+For development, run `npm run dev`. This uses Node's built-in watch mode to
+restart the server when imported application files change.
+
+Use `npm ci` for installs and `npm run lint` plus
+`npm test -- --runInBand --coverage=false` for validation. Husky uses
+`.husky/pre-commit` for staged lint and `.husky/pre-push` for tests. Production
+and CI installs skip hook initialization; application/native install scripts
+still run. PR CI also builds the production image and checks its non-root
+runtime, secret exclusions and native bcrypt.
+
+The Docker image runs as the `node` user. Supply private configuration at runtime
+using environment variables or your deployment's secret mechanism; local `.env`,
+Git metadata and private key files are excluded from the build context.
+
+### Demo reset workflow
+
+Automatic daily resets are disabled. The manual workflow only accepts confirmed
+runs from `main`, uses the GitHub `demo` environment, and serializes resets.
+Before using it, configure an environment secret `DEMO_DATABASE_URL` and variable
+`DEMO_DATABASE_NAME`. The name must end in `_demo` (for example,
+`aftermath_demo`) and exactly match the URL's database path. Use a dedicated
+demo database and credentials limited to it. The workflow no longer uses the
+general `DATABASE_URL` repository secret, and fails before dropping data when
+the target check fails. Existing connection/seed failure reporting still needs
+the separate backend reliability work.
 
 Visit `http://localhost:PORT` in your browser or use an API client like Postman or Bruno to test endpoints.
 
@@ -155,6 +181,14 @@ For easier setup, a `docker-compose.yml` file for both front and backend is [ava
 By following these steps, you will have a fully deployed and functional backend for the Aftermath Archive application.
 
 ## 🔐 Authentication with Passport.js
+
+Login returns `{ message, token }`. Access tokens use HS256, contain the user's
+MongoDB ID in the `id` claim, and expire after 24 hours. Send
+`Authorization: Bearer <token>` on protected requests. Both the JWT middleware
+and Passport require a valid signature, expiry, user ID, and an active account.
+Discussion authors are taken from the authenticated account. Logout still
+requires the client to discard its token; server-side token revocation is not
+implemented.
 
 This application uses Passport.js for handling authentication. The core configuration for Passport is located in `src/config/passport.js`, where strategies are defined. By default, the app is configured to support JWT authentication.
 

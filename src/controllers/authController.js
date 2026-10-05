@@ -1,5 +1,5 @@
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
+const { generateJWT } = require('../functions/jwtFunctions');
 const dotenv = require('dotenv');
 const { registerNewUserService } = require('../services/authService');
 const logError = require('../utils/logError');
@@ -42,24 +42,28 @@ async function handleRegisterUser(req, res) {
 async function handleLoginUser(req, res) {
     try {
         const { username, password } = req.body;
+        if (
+            typeof username !== 'string' || !username.trim() ||
+            typeof password !== 'string' || !password
+        ) {
+            return res.status(400).json({ message: 'Invalid username or password' });
+        }
         const user = await User.findOne({ username });
 
-        if (!user) {
-            return res.status(400).json({ message: 'User not found' });
+        if (!user || user.isActive !== true) {
+            return res.status(400).json({ message: 'Invalid username or password' });
         }
 
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
-            return res.status(400).json({ message: 'Incorrect password' });
+            return res.status(400).json({ message: 'Invalid username or password' });
         }
 
         // Update the lastLogin field to the current date and time for audit purposes
         user.lastLogin = new Date();
         await user.save();
 
-        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET_KEY, {
-            expiresIn: '24h',
-        });
+        const token = generateJWT(user._id);
 
         res.status(200).json({ message: 'Logged in successfully', token });
     } catch (error) {

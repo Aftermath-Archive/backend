@@ -3,6 +3,11 @@ const { Strategy: JwtStrategy, ExtractJwt } = require('passport-jwt');
 const dotenv = require('dotenv');
 
 const { User } = require('../models/userModel');
+const {
+    JWT_ALGORITHM,
+    getJwtSecretKey,
+    getJwtUserId,
+} = require('../functions/jwtFunctions');
 
 dotenv.config();
 
@@ -25,14 +30,21 @@ dotenv.config();
 
 const jwtOptions = {
     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-    secretOrKey: process.env.JWT_SECRET_KEY,
+    secretOrKey: getJwtSecretKey(),
+    algorithms: [JWT_ALGORITHM],
 };
 
 passport.use(
     new JwtStrategy(jwtOptions, async (payload, done) => {
+        let userId;
         try {
-            const user = await User.findById(payload.id);
-            if (user) {
+            userId = getJwtUserId(payload);
+        } catch {
+            return done(null, false, { message: 'Invalid access token' });
+        }
+        try {
+            const user = await User.findById(userId);
+            if (user && user.isActive === true) {
                 return done(null, user);
             }
             return done(null, false, { message: 'User not found' });
