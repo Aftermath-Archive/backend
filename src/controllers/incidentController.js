@@ -9,7 +9,6 @@ const {
 } = require('../services/incidentService');
 
 const checkIncidentPresence = require('../utils/checkIncidentPresence');
-const { decodeJWT } = require('../functions/jwtFunctions');
 
 /**
  * Handle creation of a new incident function. It receives a request object and a response object. It tries to create a new incident using the createNewIncidentService function with the request body. If successful, it responds with status code 201 and the incident object in JSON format. If an error occurs, it logs the error and responds with status code 400 and an error message in JSON format.
@@ -175,16 +174,7 @@ async function handleAddDiscussion(req, res) {
     try {
         const { message } = req.body;
 
-        // Decode the JWT from the authorization header
-        const token = req.headers.authorization?.split(' ')[1];
-        if (!token) {
-            return res
-                .status(401)
-                .json({ message: 'Authorization token missing.' });
-        }
-
-        const decoded = decodeJWT(token);
-        const id = decoded.id; // Extract user ID from the token
+        const id = req.userId;
 
         if (!message || !id) {
             return res

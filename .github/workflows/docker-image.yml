@@ -1,5 +1,11 @@
 name: Docker Image Pipeline
 
+permissions:
+    contents: read
+
+env:
+    HUSKY: '0'
+
 on:
     push:
         branches:
@@ -9,21 +15,53 @@ on:
             - main
 
 jobs:
+    validate:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  persist-credentials: false
+            - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+              with:
+                  node-version-file: '.nvmrc'
+                  cache: 'npm'
+            - run: npm ci
+            - run: npm run lint
+            - run: npm test -- --runInBand --coverage=false
+            - name: Build production image
+              run: docker build --tag aftermath-backend:check .
+            - name: Verify non-root runtime and native bcrypt
+              run: |
+                  docker run --rm --entrypoint node aftermath-backend:check -e '
+                    const assert = require("node:assert/strict");
+                    const fs = require("node:fs");
+                    const bcrypt = require("bcrypt");
+                    assert.notEqual(process.getuid(), 0);
+                    assert.equal(process.env.NODE_ENV, "production");
+                    assert.equal(fs.existsSync(".env"), false);
+                    assert.equal(fs.existsSync(".git"), false);
+                    assert(bcrypt.compareSync("image-smoke", bcrypt.hashSync("image-smoke", 4)));
+                  '
+
     build-and-push:
+        needs: validate
+        if: github.event_name == 'push'
         runs-on: ubuntu-latest
 
         steps:
             - name: Checkout code
-              uses: actions/checkout@v4
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  persist-credentials: false
 
             - name: Set up Node.js
-              uses: actions/setup-node@v4
+              uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
               with:
-                  node-version: 20
+                  node-version-file: '.nvmrc'
                   cache: 'npm'
 
             - name: Install dependencies
-              run: npm install
+              run: npm ci
 
             - name: Log in to DockerHub
               run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin

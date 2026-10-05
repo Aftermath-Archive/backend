@@ -60,7 +60,11 @@ function requestApp(app) {
                                 done({
                                     status: res.statusCode,
                                     headers: res.getHeaders(),
-                                    body: content ? JSON.parse(content) : {},
+                                    body: content
+                                        ? String(res.getHeader('content-type')).includes('application/json')
+                                            ? JSON.parse(content)
+                                            : content
+                                        : {},
                                 });
                             } catch (error) {
                                 fail(error);

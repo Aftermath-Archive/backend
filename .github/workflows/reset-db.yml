@@ -1,28 +1,42 @@
 name: Reset MongoDB Demo Data
 
 on:
-  schedule:
-    - cron: '0 0 * * *'  # Runs daily at midnight UTC
-  workflow_dispatch:
+    workflow_dispatch:
+        inputs:
+            confirm_reset:
+                description: Delete and reseed the dedicated demo database
+                type: boolean
+                required: true
+                default: false
+
+permissions:
+    contents: read
+
+env:
+    HUSKY: '0'
+
+concurrency:
+    group: demo-database-reset
+    cancel-in-progress: false
 
 jobs:
-  reset-db:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Drop and Seed Database
-        run: npm run db:drop-and-seed
+    reset-db:
+        if: github.ref == 'refs/heads/main' && inputs.confirm_reset
+        runs-on: ubuntu-latest
+        environment: demo
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+            DATABASE_URL: ${{ secrets.DEMO_DATABASE_URL }}
+            DEMO_DATABASE_NAME: ${{ vars.DEMO_DATABASE_NAME }}
+        steps:
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  persist-credentials: false
+            - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+              with:
+                  node-version-file: '.nvmrc'
+                  cache: 'npm'
+            - run: npm ci
+            - name: Verify dedicated demo target
+              run: npm run db:check-demo-target
+            - name: Drop and seed demo database
+              run: npm run db:drop-and-seed

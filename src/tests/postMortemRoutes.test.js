@@ -18,6 +18,9 @@ jest.mock('../models/incidentModel', () => ({
     },
 }));
 jest.mock('../utils/logError');
+jest.mock('../models/userModel', () => ({
+    User: { findById: jest.fn() },
+}));
 
 process.env.JWT_SECRET_KEY = 'post-mortem-test-secret';
 
@@ -27,6 +30,7 @@ const { app } = require('../server');
 const { specs } = require('../swagger');
 const { PostMortem } = require('../models/postmortemModel');
 const { Incident } = require('../models/incidentModel');
+const { User } = require('../models/userModel');
 const {
     deletePostMortemByIncidentId,
 } = require('../services/postMortemService');
@@ -34,7 +38,9 @@ const {
 const incidentId = '507f1f77bcf86cd799439011';
 const reportId = '507f1f77bcf86cd799439012';
 const userId = '507f1f77bcf86cd799439013';
-const token = jwt.sign({ id: userId }, process.env.JWT_SECRET_KEY);
+const token = jwt.sign({ id: userId }, process.env.JWT_SECRET_KEY, {
+    expiresIn: '24h',
+});
 const report = {
     _id: reportId,
     incidentId,
@@ -55,8 +61,7 @@ describe('Post-mortem API', () => {
 
     beforeEach(() => {
         jest.resetAllMocks();
-        // The existing authentication middleware logs the decoded token.
-        jest.spyOn(console, 'log').mockImplementation(() => {});
+        User.findById.mockResolvedValue({ _id: userId, isActive: true });
         Incident.exists.mockResolvedValue({ _id: incidentId });
         Incident.findOne.mockResolvedValue({ _id: incidentId });
         Incident.findOneAndDelete.mockResolvedValue({ _id: incidentId });
@@ -267,6 +272,11 @@ describe('Post-mortem API', () => {
         { createdBy: [userId, incidentId] },
         { actionItemStatus: ['Pending', 'Completed'] },
         { 'incidentId[$ne]': 'invalid' },
+        { 'createdBy.$ne': 'invalid' },
+        { 'limit[$gt]': '100' },
+        { 'page[]': '1' },
+        { 'search[0]': 'one' },
+        { incidentId, 'incidentId[$ne]': userId },
     ])('rejects invalid query %#', async (query) => {
         const response = await request(app)
             .get('/post-mortems/search')

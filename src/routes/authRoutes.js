@@ -43,7 +43,7 @@ router.post('/register', authController.handleRegisterUser);
  * /auth/login:
  *   post:
  *     summary: Log in a user
- *     description: Authenticate a user with a username and password and return a JWT token.
+ *     description: Authenticate an active user and return an HS256 JWT containing their id claim, valid for 24 hours. Send the token in the Authorization header as Bearer <token>.
  *     tags: [Auth]
  *     requestBody:
  *       required: true

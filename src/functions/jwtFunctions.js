@@ -1,26 +1,62 @@
 const jwt = require('jsonwebtoken');
 
-let jwtSecretKey = process.env.JWT_SECRET_KEY;
+const JWT_ALGORITHM = 'HS256';
+const JWT_LIFETIME_SECONDS = 24 * 60 * 60;
 
-function generateJWT(userId, username, role = null) {
-    return jwt.sign(
-        {
-            userId: userId,
-            username: username,
-            role: role,
-        },
-        jwtSecretKey,
-        {
-            expiresIn: '7d',
-        }
-    );
+function getJwtSecretKey() {
+    const secret = process.env.JWT_SECRET_KEY;
+    if (typeof secret !== 'string' || !secret.trim()) {
+        throw new Error('JWT_SECRET_KEY must be configured.');
+    }
+    return secret;
 }
 
-function decodeJWT(tokenToDecode) {
-    return jwt.verify(tokenToDecode, jwtSecretKey);
+function getJwtUserId(payload) {
+    if (
+        !payload ||
+        typeof payload !== 'object' ||
+        typeof payload.id !== 'string' ||
+        !/^[a-fA-F0-9]{24}$/.test(payload.id) ||
+        typeof payload.exp !== 'number' ||
+        !Number.isFinite(payload.exp)
+    ) {
+        throw new jwt.JsonWebTokenError('Invalid access token claims.');
+    }
+    return payload.id;
+}
+
+/** Issue the id claim and 24-hour lifetime used by /auth/login. */
+function generateJWT(userId) {
+    const id = String(userId);
+    if (!/^[a-fA-F0-9]{24}$/.test(id)) {
+        throw new TypeError('A valid user ID is required.');
+    }
+    return jwt.sign({ id }, getJwtSecretKey(), {
+        algorithm: JWT_ALGORITHM,
+        expiresIn: JWT_LIFETIME_SECONDS,
+    });
+}
+
+/** Verify signature and expiry before reading identity claims. */
+function verifyJWT(token) {
+    const payload = jwt.verify(token, getJwtSecretKey(), {
+        algorithms: [JWT_ALGORITHM],
+    });
+    getJwtUserId(payload);
+    return payload;
+}
+
+function extractBearerToken(authHeader) {
+    if (typeof authHeader !== 'string') return null;
+    const match = /^Bearer[ \t]+([^\s]+)$/i.exec(authHeader.trim());
+    return match ? match[1] : null;
 }
 
 module.exports = {
+    JWT_ALGORITHM,
+    getJwtSecretKey,
+    getJwtUserId,
     generateJWT,
-    decodeJWT,
+    verifyJWT,
+    extractBearerToken,
 };

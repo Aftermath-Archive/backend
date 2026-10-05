@@ -4,11 +4,11 @@ describe('Post-mortem model', () => {
     test('has a unique incident index to prevent concurrent duplicate reports', () => {
         expect(PostMortem.schema.indexes()).toContainEqual([
             { incidentId: 1 },
-            { unique: true, background: true },
+            expect.objectContaining({ unique: true }),
         ]);
     });
 
-    test('supplies report and action item defaults and trims text', () => {
+    test('supplies report and action item defaults and trims text', async () => {
         const postMortem = new PostMortem({
             incidentId: '507f1f77bcf86cd799439011',
             createdBy: '507f1f77bcf86cd799439013',
@@ -16,7 +16,7 @@ describe('Post-mortem model', () => {
             impact: '  API unavailable  ',
             actionItems: [{ description: '  Monitor  ' }],
         });
-        expect(postMortem.validateSync()).toBeUndefined();
+        await expect(postMortem.validate()).resolves.toBeUndefined();
         expect(postMortem.rootCause).toBe('Timeout');
         expect(postMortem.impact).toBe('API unavailable');
         expect(postMortem.lessonsLearned).toBe('');
