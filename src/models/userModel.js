@@ -21,7 +21,9 @@ const UserSchema = new mongoose.Schema(
         password: {
             type: String,
             required: true,
+            select: false,
         },
+        tokenVersion: { type: Number, default: 0, min: 0, select: false },
         // optional for potential OAuth integration in future
         oauthProvider: {
             type: String,

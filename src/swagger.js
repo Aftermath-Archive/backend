@@ -29,11 +29,6 @@ const options = {
                 },
             },
         },
-        security: [
-            {
-                bearerAuth: [],
-            },
-        ],
     },
     apis: [__dirname + '/routes/*.js'], // Using absolute path to routes as relative broke
 };
