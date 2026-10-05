@@ -61,7 +61,11 @@ describe('Post-mortem API', () => {
 
     beforeEach(() => {
         jest.resetAllMocks();
-        User.findById.mockResolvedValue({ _id: userId, isActive: true });
+        User.findById.mockResolvedValue({
+            _id: userId,
+            isActive: true,
+            role: 'Admin',
+        });
         Incident.exists.mockResolvedValue({ _id: incidentId });
         Incident.findOne.mockResolvedValue({ _id: incidentId });
         Incident.findOneAndDelete.mockResolvedValue({ _id: incidentId });
@@ -472,7 +476,9 @@ describe('Post-mortem API', () => {
     });
 
     test('the incident deletion route also deletes its post-mortem', async () => {
-        const response = await request(app).delete(`/incidents/${incidentId}`);
+        const response = await request(app)
+            .delete(`/incidents/${incidentId}`)
+            .set('Authorization', `Bearer ${token}`);
         expect(response.status).toBe(200);
         expect(response.body).toEqual({ _id: incidentId });
         expect(PostMortem.findOneAndDelete).toHaveBeenCalledWith({
@@ -485,7 +491,9 @@ describe('Post-mortem API', () => {
         PostMortem.findOneAndDelete.mockRejectedValue(
             new Error('database failure')
         );
-        const response = await request(app).delete(`/incidents/${incidentId}`);
+        const response = await request(app)
+            .delete(`/incidents/${incidentId}`)
+            .set('Authorization', `Bearer ${token}`);
         expect(response.status).toBe(500);
         expect(response.body).toEqual({
             message: 'Failed to delete post-mortem.',
