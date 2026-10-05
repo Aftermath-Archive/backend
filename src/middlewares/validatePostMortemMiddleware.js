@@ -6,17 +6,7 @@ const actionItemStatuses = ['Pending', 'In Progress', 'Completed'];
 function returnValidationErrors(req, res, next) {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res
-            .status(400)
-            .json({
-                errors: errors
-                    .array()
-                    .map((error) => ({
-                        msg: error.msg,
-                        path: error.path,
-                        location: error.location,
-                    })),
-            });
+        return res.status(400).json({ errors: errors.array() });
     }
     next();
 }
@@ -31,18 +21,13 @@ function reportValidation(isUpdate) {
                 .isString()
                 .bail()
                 .trim()
-                .isLength({ min: 1, max: 5000 })
+                .notEmpty()
                 .withMessage(`${field} must be a non-empty string.`);
         }),
-        body('lessonsLearned')
-            .optional()
-            .isString()
-            .bail()
-            .trim()
-            .isLength({ max: 5000 }),
+        body('lessonsLearned').optional().isString().bail().trim(),
         body('actionItems')
             .optional()
-            .isArray({ max: 50 })
+            .isArray()
             .withMessage('Action items must be an array.'),
         body('actionItems.*')
             .isObject({ strict: true })
@@ -51,7 +36,7 @@ function reportValidation(isUpdate) {
             .isString()
             .bail()
             .trim()
-            .isLength({ min: 1, max: 1000 })
+            .notEmpty()
             .withMessage('Each action item requires a description.'),
         body('actionItems.*.status')
             .optional()
@@ -94,14 +79,12 @@ const validatePostMortemQueryMiddleware = [
         );
         if (invalidKey !== undefined) {
             return res.status(400).json({
-                errors: [
-                    {
-                        type: 'field',
-                        location: 'query',
-                        path: invalidKey,
-                        msg: 'Query parameters must use plain field names.',
-                    },
-                ],
+                errors: [{
+                    type: 'field',
+                    location: 'query',
+                    path: invalidKey,
+                    msg: 'Query parameters must use plain field names.',
+                }],
             });
         }
         next();

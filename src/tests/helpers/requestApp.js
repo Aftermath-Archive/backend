@@ -13,7 +13,6 @@ function requestApp(app) {
             const headers = {};
             let body;
             let query = '';
-            let remoteAddress = '127.0.0.1';
             const request = {
                 set(name, value) {
                     headers[name.toLowerCase()] = value;
@@ -21,14 +20,6 @@ function requestApp(app) {
                 },
                 send(value) {
                     body = JSON.stringify(value);
-                    return request;
-                },
-                sendRaw(value) {
-                    body = value;
-                    return request;
-                },
-                ip(value) {
-                    remoteAddress = value;
                     return request;
                 },
                 query(value) {
@@ -46,9 +37,6 @@ function requestApp(app) {
                             },
                         });
                         const req = new IncomingMessage(socket);
-                        Object.defineProperty(socket, 'remoteAddress', {
-                            value: remoteAddress,
-                        });
                         req.method = method.toUpperCase();
                         req.url = query ? `${url}?${query}` : url;
                         req.complete = true;
@@ -73,9 +61,7 @@ function requestApp(app) {
                                     status: res.statusCode,
                                     headers: res.getHeaders(),
                                     body: content
-                                        ? String(
-                                              res.getHeader('content-type')
-                                          ).includes('application/json')
+                                        ? String(res.getHeader('content-type')).includes('application/json')
                                             ? JSON.parse(content)
                                             : content
                                         : {},

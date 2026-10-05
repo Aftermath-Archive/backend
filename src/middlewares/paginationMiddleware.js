@@ -1,24 +1,19 @@
-const AppError = require('../utils/AppError');
 
+/**
+ * A middleware function that calculates pagination parameters based on the request query parameters 'page' and 'limit'. It assigns the calculated 'page', 'limit', and 'skip' values to the request object and proceeds to the next middleware in the chain.
+ * @author Xander
+ *
+ * @param {*} req The request object
+ * @param {*} res The response object
+ * @param {*} next The next function to be called in the middleware chain
+ */
 function paginationMiddleware(req, res, next) {
-    const { page = '1', limit = '10' } = req.query;
-    if (
-        typeof page !== 'string' ||
-        !/^[1-9]\d*$/.test(page) ||
-        typeof limit !== 'string' ||
-        !/^[1-9]\d*$/.test(limit) ||
-        Number(page) > 10000 ||
-        Number(limit) > 100
-    ) {
-        return next(
-            new AppError('Page must be 1–10000 and limit must be 1–100.', 400)
-        );
-    }
-    req.pagination = {
-        page: Number(page),
-        limit: Number(limit),
-        skip: (Number(page) - 1) * Number(limit),
-    };
+    const page = parseInt(req.query.page, 10) || 1;
+    const limit = parseInt(req.query.limit, 10) || 10;
+    const skip = (page - 1) * limit;
+
+    req.pagination = { page, limit, skip };
     next();
 }
+
 module.exports = paginationMiddleware;

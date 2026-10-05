@@ -13,21 +13,10 @@ on:
     pull_request:
         branches:
             - main
-            - feat/node-26-dependency-baseline
 
 jobs:
     validate:
         runs-on: ubuntu-latest
-        services:
-            mongodb:
-                image: mongo:8.0
-                ports:
-                    - 27017:27017
-                options: >-
-                    --health-cmd "mongosh --quiet --eval 'db.adminCommand({ ping: 1 })'"
-                    --health-interval 10s
-                    --health-timeout 5s
-                    --health-retries 10
         steps:
             - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
@@ -39,10 +28,6 @@ jobs:
             - run: npm ci
             - run: npm run lint
             - run: npm test -- --runInBand --coverage=false
-            - name: Test security against disposable MongoDB
-              run: npm run test:integration
-              env:
-                  INTEGRATION_DATABASE_URL: mongodb://127.0.0.1:27017/aftermath_security_test
             - name: Build production image
               run: docker build --tag aftermath-backend:check .
             - name: Verify non-root runtime and native bcrypt
@@ -57,26 +42,6 @@ jobs:
                     assert.equal(fs.existsSync(".git"), false);
                     assert(bcrypt.compareSync("image-smoke", bcrypt.hashSync("image-smoke", 4)));
                   '
-            - name: Verify production startup and database readiness
-              run: |
-                  container=$(docker run --detach --network host \
-                    -e DATABASE_URL=mongodb://127.0.0.1:27017/aftermath_image_test \
-                    -e JWT_SECRET_KEY=ci-only-disposable-image-secret-at-least-32-bytes \
-                    -e CORS_ORIGINS=https://aftermath-archive.xyz \
-                    aftermath-backend:check)
-                  trap 'docker rm --force "$container" >/dev/null' EXIT
-                  ready=false
-                  for attempt in $(seq 1 30); do
-                    if curl --fail --silent http://127.0.0.1:8080/health/ready >/dev/null; then
-                      ready=true
-                      break
-                    fi
-                    sleep 1
-                  done
-                  test "$ready" = true
-                  test "$(curl --silent --output /dev/null --write-out '%{http_code}' \
-                    -X PATCH -H 'Content-Type: application/json' --data '{"title":"blocked"}' \
-                    http://127.0.0.1:8080/incidents/507f1f77bcf86cd799439011)" = 401
 
     build-and-push:
         needs: validate

@@ -18,9 +18,7 @@ function getJwtUserId(payload) {
         typeof payload.id !== 'string' ||
         !/^[a-fA-F0-9]{24}$/.test(payload.id) ||
         typeof payload.exp !== 'number' ||
-        !Number.isFinite(payload.exp) ||
-        (payload.version !== undefined &&
-            (!Number.isSafeInteger(payload.version) || payload.version < 0))
+        !Number.isFinite(payload.exp)
     ) {
         throw new jwt.JsonWebTokenError('Invalid access token claims.');
     }
@@ -28,14 +26,12 @@ function getJwtUserId(payload) {
 }
 
 /** Issue the id claim and 24-hour lifetime used by /auth/login. */
-function generateJWT(userId, version = 0) {
+function generateJWT(userId) {
     const id = String(userId);
     if (!/^[a-fA-F0-9]{24}$/.test(id)) {
         throw new TypeError('A valid user ID is required.');
     }
-    if (!Number.isSafeInteger(version) || version < 0)
-        throw new TypeError('Invalid token version.');
-    return jwt.sign({ id, version }, getJwtSecretKey(), {
+    return jwt.sign({ id }, getJwtSecretKey(), {
         algorithm: JWT_ALGORITHM,
         expiresIn: JWT_LIFETIME_SECONDS,
     });

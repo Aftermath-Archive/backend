@@ -43,12 +43,8 @@ passport.use(
             return done(null, false, { message: 'Invalid access token' });
         }
         try {
-            const user = await User.findById(userId, '+tokenVersion');
-            if (
-                user &&
-                user.isActive === true &&
-                (payload.version ?? 0) === (user.tokenVersion ?? 0)
-            ) {
+            const user = await User.findById(userId);
+            if (user && user.isActive === true) {
                 return done(null, user);
             }
             return done(null, false, { message: 'User not found' });

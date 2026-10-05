@@ -213,13 +213,3 @@ This enhancement would involve:
 3. Securely storing refresh tokens and invalidating them upon logout.
 
 This feature is beyond the current project scope but would improve scalability and security for production use.
-
-## Endpoint security baseline
-
-See [the endpoint policy and deployment requirements](docs/security-baseline.md)
-for authentication/authorization, safe responses, request bounds and rate limits.
-Production now requires exact HTTPS `CORS_ORIGINS` and a strong `JWT_SECRET_KEY`
-before listening; configure trusted proxy IP/CIDRs only when actually deployed
-behind that proxy. The frontend security compatibility change must accompany
-this branch because user-directory reads require login and incident listing is
-now paginated at the database.

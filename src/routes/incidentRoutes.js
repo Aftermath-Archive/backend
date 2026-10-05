@@ -8,10 +8,6 @@ const validateDiscussionMiddleware = require('../middlewares/validateDiscussionM
 const paginationMiddleware = require('../middlewares/paginationMiddleware');
 const validateObjectIdMiddleware = require('../middlewares/validateObjectIdMiddleware');
 const verifyTokenMiddleware = require('../middlewares/verifyTokenMiddleware');
-const { requireAdmin } = require('../middlewares/authorizationMiddleware');
-const {
-    validateUpdateIncidentMiddleware,
-} = require('../middlewares/validateIncidentMiddleware');
 
 /**
  * @swagger
@@ -20,8 +16,6 @@ const {
  *     summary: Create a new incident
  *     description: Add a new incident to the system.
  *     tags: [Incidents]
- *     security:
- *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -38,8 +32,7 @@ const {
  *                 enum: [Production, Staging, Development]
  *               createdBy:
  *                 type: string
- *                 readOnly: true
- *                 description: Derived from authentication; omit from request bodies.
+ *                 description: User ID of the creator
  *     responses:
  *       201:
  *         description: Incident created successfully
@@ -60,7 +53,6 @@ router.post(
  *     summary: Get all incidents
  *     description: Fetch a paginated list of all incidents.
  *     tags: [Incidents]
- *     security: []
  *     parameters:
  *       - in: query
  *         name: page
@@ -87,7 +79,6 @@ router.get('/', paginationMiddleware, incidentController.handleGetAllIncidents);
  *     summary: Search incidents
  *     description: Search and filter incidents by fields like title, severity, and more.
  *     tags: [Incidents]
- *     security: []
  *     parameters:
  *       - in: query
  *         name: title
@@ -105,11 +96,7 @@ router.get('/', paginationMiddleware, incidentController.handleGetAllIncidents);
  *       400:
  *         description: Bad request
  */
-router.get(
-    '/search',
-    paginationMiddleware,
-    incidentController.handleSearchIncidents
-);
+router.get('/search', incidentController.handleSearchIncidents);
 
 /**
  * @swagger
@@ -118,7 +105,6 @@ router.get(
  *     summary: Get incident by ID
  *     description: Fetch a specific incident by its unique ID.
  *     tags: [Incidents]
- *     security: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -146,8 +132,6 @@ router.get(
  *     summary: Update an incident
  *     description: Modify the details of an existing incident.
  *     tags: [Incidents]
- *     security:
- *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -179,9 +163,7 @@ router.get(
  */
 router.patch(
     '/:id',
-    verifyTokenMiddleware,
     validateObjectIdMiddleware,
-    validateUpdateIncidentMiddleware,
     incidentController.handleUpdateIncident
 );
 
@@ -190,10 +172,8 @@ router.patch(
  * /incidents/{id}:
  *   delete:
  *     summary: Delete an incident
- *     description: Admin-only removal of an incident and its associated post-mortem from the system by its unique ID.
+ *     description: Remove an incident and its associated post-mortem from the system by its unique ID.
  *     tags: [Incidents]
- *     security:
- *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -210,9 +190,7 @@ router.patch(
  */
 router.delete(
     '/:id',
-    verifyTokenMiddleware,
     validateObjectIdMiddleware,
-    requireAdmin,
     incidentController.handleDeleteIncident
 );
 
@@ -223,8 +201,6 @@ router.delete(
  *     summary: Add discussion to an incident
  *     description: Add a case discussion (comment) to an incident.
  *     tags: [Incidents]
- *     security:
- *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id

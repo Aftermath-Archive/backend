@@ -16,9 +16,11 @@ const {
     deleteIncidentByQueryService,
 } = require('../services/incidentService');
 
+const checkIncidentPresence = require('../utils/checkIncidentPresence');
+
 // Mock dependencies
 jest.mock('../services/incidentService');
-
+jest.mock('../utils/checkIncidentPresence');
 jest.mock('../utils/logError');
 
 describe('Incident Controller', () => {
@@ -27,8 +29,6 @@ describe('Incident Controller', () => {
     beforeEach(() => {
         mockReq = {
             body: {},
-            validatedBody: {},
-            userId: '507f1f77bcf86cd799439013',
             params: {},
             query: {},
             pagination: { page: 1, limit: 10 },
@@ -47,17 +47,14 @@ describe('Incident Controller', () => {
         const mockIncident = { id: '123', title: 'New Incident' };
         createNewIncidentService.mockResolvedValue(mockIncident);
 
-        mockReq.validatedBody = {
+        mockReq.body = {
             title: 'New Incident',
             description: 'Test description',
         };
 
         await handleCreateIncident(mockReq, mockRes);
 
-        expect(createNewIncidentService).toHaveBeenCalledWith({
-            ...mockReq.validatedBody,
-            createdBy: mockReq.userId,
-        });
+        expect(createNewIncidentService).toHaveBeenCalledWith(mockReq.body);
         expect(mockRes.status).toHaveBeenCalledWith(201);
         expect(mockRes.json).toHaveBeenCalledWith(mockIncident);
     });
@@ -73,6 +70,7 @@ describe('Incident Controller', () => {
         expect(findIncidentByQueryService).toHaveBeenCalledWith({
             _id: mockReq.params.id,
         });
+        expect(mockRes.status).toHaveBeenCalledWith(200);
         expect(mockRes.json).toHaveBeenCalledWith(mockIncident);
     });
 
@@ -89,6 +87,7 @@ describe('Incident Controller', () => {
             {},
             mockReq.pagination
         );
+        expect(mockRes.status).toHaveBeenCalledWith(200);
         expect(mockRes.json).toHaveBeenCalledWith(mockIncidents);
     });
 
@@ -103,10 +102,8 @@ describe('Incident Controller', () => {
 
         await handleSearchIncidents(mockReq, mockRes);
 
-        expect(findIncidentsByQueryService).toHaveBeenCalledWith(
-            mockReq.query,
-            mockReq.pagination
-        );
+        expect(findIncidentsByQueryService).toHaveBeenCalledWith(mockReq.query);
+        expect(mockRes.status).toHaveBeenCalledWith(200);
         expect(mockRes.json).toHaveBeenCalledWith({
             incidentsQuery: mockIncidents,
         });
@@ -114,34 +111,38 @@ describe('Incident Controller', () => {
 
     test('handleUpdateIncident should update an incident and return 200', async () => {
         const mockIncident = { id: '123', title: 'Updated Incident' };
+        checkIncidentPresence.mockResolvedValue(mockIncident);
         updateIncidentByQueryService.mockResolvedValue(mockIncident);
 
         mockReq.params.id = '123';
-        mockReq.validatedBody = { title: 'Updated Incident' };
+        mockReq.body = { title: 'Updated Incident' };
 
         await handleUpdateIncident(mockReq, mockRes);
 
-        expect(updateIncidentByQueryService).toHaveBeenCalledWith(
-            { _id: mockReq.params.id },
-            mockReq.validatedBody,
-            mockReq.userId
+        expect(checkIncidentPresence).toHaveBeenCalledWith(
+            findIncidentByQueryService,
+            { _id: mockReq.params.id }
         );
 
+        expect(mockRes.status).toHaveBeenCalledWith(200);
         expect(mockRes.json).toHaveBeenCalledWith(mockIncident);
     });
 
     test('handleDeleteIncident should delete an incident and return 200', async () => {
         const mockIncident = { id: '123', title: 'Deleted Incident' };
+        checkIncidentPresence.mockResolvedValue(mockIncident);
         deleteIncidentByQueryService.mockResolvedValue(mockIncident);
 
         mockReq.params.id = '123';
 
         await handleDeleteIncident(mockReq, mockRes);
 
-        expect(deleteIncidentByQueryService).toHaveBeenCalledWith({
-            _id: mockReq.params.id,
-        });
+        expect(checkIncidentPresence).toHaveBeenCalledWith(
+            findIncidentByQueryService,
+            { _id: mockReq.params.id }
+        );
 
+        expect(mockRes.status).toHaveBeenCalledWith(200);
         expect(mockRes.json).toHaveBeenCalledWith(mockIncident);
     });
 });

@@ -1,48 +1,91 @@
 const bcrypt = require('bcrypt');
 const { generateJWT } = require('../functions/jwtFunctions');
+const dotenv = require('dotenv');
 const { registerNewUserService } = require('../services/authService');
+const logError = require('../utils/logError');
 const { User } = require('../models/userModel');
-// Equal-cost verification for absent accounts avoids a fast username oracle.
-const DUMMY_PASSWORD_HASH =
-    '$2b$12$XUO6B92JIKZHJmzczgoMNOWhKi/Gf3mZtv9U6Fc.5ZAM9O5ozkLEC';
+
+dotenv.config();
+
+/**
+ * Handles the registration of a new user. It calls the registerNewUserService function with the request body to register the user. If successful, it responds with status 201 and the user data in JSON format. If an error occurs during registration, it logs the error and responds with status 400 along with an error message in JSON format.
+ * @author Xander
+ *
+ * @async
+ * @param {*} req The request object containing the user data
+ * @param {*} res The response object to send back the user data or error message
+ * @returns {*} Handles registering a new user by calling the registerNewUserService with the request body. Responds with the user data if successful, or an error message if there is an error.
+ */
 async function handleRegisterUser(req, res) {
-    res.status(201).json(await registerNewUserService(req.validatedBody));
+    try {
+        const user = await registerNewUserService(req.body);
+        res.status(201).json(user);
+    } catch (error) {
+        logError('Registering User', error);
+        res.status(400).json({ message: error.message });
+    }
 }
+
+/**
+ * Handles the login process for a user.
+ * - Retrieves the user object from the request.
+ * - Generates a JWT token with the user's ID using the provided secret key.
+ * - Sends a success response with a message and the generated token if successful.
+ * - Logs any errors encountered during the process and sends an error response with the error message if there is an exception.
+ * @author Xander
+ *
+ * @async
+ * @param {*} req The request object
+ * @param {*} res The response object
+ * @returns {*} Handles the login process for a user by generating a JWT token and responding with a success message or an error message
+ */
 async function handleLoginUser(req, res) {
-    const { username, password } = req.body || {};
-    if (
-        typeof username !== 'string' ||
-        !username.trim() ||
-        username.length > 64 ||
-        typeof password !== 'string' ||
-        !password ||
-        Buffer.byteLength(password) > 72
-    ) {
-        return res
-            .status(400)
-            .json({ message: 'Invalid username or password' });
+    try {
+        const { username, password } = req.body;
+        if (
+            typeof username !== 'string' || !username.trim() ||
+            typeof password !== 'string' || !password
+        ) {
+            return res.status(400).json({ message: 'Invalid username or password' });
+        }
+        const user = await User.findOne({ username });
+
+        if (!user || user.isActive !== true) {
+            return res.status(400).json({ message: 'Invalid username or password' });
+        }
+
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            return res.status(400).json({ message: 'Invalid username or password' });
+        }
+
+        // Update the lastLogin field to the current date and time for audit purposes
+        user.lastLogin = new Date();
+        await user.save();
+
+        const token = generateJWT(user._id);
+
+        res.status(200).json({ message: 'Logged in successfully', token });
+    } catch (error) {
+        logError('Logging in user', error);
+        res.status(500).json({ message: 'Internal server error' });
     }
-    const user = await User.findOne(
-        { username: username.trim() },
-        '+password +tokenVersion'
-    );
-    const matches = await bcrypt.compare(
-        password,
-        user?.password || DUMMY_PASSWORD_HASH
-    );
-    if (!user || user.isActive !== true || !matches) {
-        return res
-            .status(400)
-            .json({ message: 'Invalid username or password' });
-    }
-    user.lastLogin = new Date();
-    await user.save();
-    res.json({
-        message: 'Logged in successfully',
-        token: generateJWT(user._id, user.tokenVersion || 0),
-    });
 }
+/**
+ * Handles the logout action for the user. It logs out the user by calling req.logout and sends a success or failure message based on the result.
+ * @author Xander
+ *
+ * @async
+ * @param {*} req The request object
+ * @param {*} res The response object
+ * @returns {*} Handles user logout by calling req.logout and responds with success or error messages
+ */
 async function handleLogoutUser(req, res) {
-    res.json({ message: 'Logged out successfully' });
+    res.status(200).json({ message: 'Logged out successfully' });
 }
-module.exports = { handleRegisterUser, handleLoginUser, handleLogoutUser };
+
+module.exports = {
+    handleRegisterUser,
+    handleLoginUser,
+    handleLogoutUser,
+};

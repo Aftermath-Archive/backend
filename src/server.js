@@ -1,77 +1,79 @@
 const express = require('express');
+const app = express();
 const cors = require('cors');
-const helmet = require('helmet');
-const { corsOrigins, trustedProxies } = require('./config/runtime');
-const { plainObject } = require('./utils/inputValidation');
-const AppError = require('./utils/AppError');
-const errorHandler = require('./middlewares/errorHandlerMiddleware');
-const validateQuery = require('./middlewares/validateQueryMiddleware');
+
+// CORS options
+let corsOptions = {
+    origin: [
+        'http://localhost:3000', // CRA local
+        'http://localhost:5173', // vite local
+        'http://aftermath-archive.xyz', // production
+        'https://aftermath-archive.xyz', // production - https
+    ],
+    optionsSuccessStatus: 200,
+};
+
+// Middleware setup
+app.use(express.json());
+app.use(cors(corsOptions)); // CORS middleware
+app.use(express.urlencoded({ extended: true }));
+
+// Handle CORS preflight requests
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', req.headers.origin); // Dynamically allow the requesting origin
+    res.header(
+        'Access-Control-Allow-Methods',
+        'GET, POST, PUT, PATCH, DELETE, OPTIONS'
+    );
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    if (req.method === 'OPTIONS') {
+        return res.sendStatus(200); // Respond with HTTP 200 for preflight requests
+    }
+    next();
+});
+
+/**
+ * swagger configuration
+ */
 const { specs, swaggerUi } = require('./swagger');
-const createRateLimits = require('./middlewares/rateLimitMiddleware');
-function createApp(env = process.env, rateLimitOptions = {}) {
-    const app = express();
-    const origins = corsOrigins(env);
-    app.disable('x-powered-by');
-    app.set('trust proxy', trustedProxies(env));
-    app.set('query parser', 'simple');
-    app.use(
-        helmet({
-            strictTransportSecurity:
-                env.NODE_ENV === 'production' ? undefined : false,
-            contentSecurityPolicy: {
-                directives: {
-                    upgradeInsecureRequests:
-                        env.NODE_ENV === 'production' ? [] : null,
-                },
-            },
-        })
-    );
-    app.use(
-        cors({
-            origin(origin, callback) {
-                callback(
-                    origin && !origins.includes(origin)
-                        ? new AppError('Origin is not allowed.', 403)
-                        : null,
-                    origin || false
-                );
-            },
-            methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
-            allowedHeaders: ['Content-Type', 'Authorization'],
-            optionsSuccessStatus: 200,
-        })
-    );
-    const limits = createRateLimits(rateLimitOptions);
-    app.use(limits.api);
-    app.post('/auth/login', limits.login);
-    app.post('/auth/register', limits.register);
-    app.use(express.json({ limit: '64kb' }));
-    app.patch('/users/:id', (req, res, next) => {
-        if (req.body?.password !== undefined)
-            return limits.password(req, res, next);
-        next();
+// swagger init
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
+
+/**
+ * passport configuration
+ */
+const passport = require('passport');
+require('./config/passport');
+
+// passport init
+app.use(passport.initialize());
+
+// homepage route to confirm server running
+app.get('/', (request, response) => {
+    response.json({
+        message: 'Hello, world!',
     });
-    app.use((req, res, next) => {
-        if (['POST', 'PATCH'].includes(req.method) && !plainObject(req.body))
-            return next(new AppError('A JSON object body is required.', 400));
-        next();
-    });
-    app.use(validateQuery);
-    app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
-    app.get('/', (req, res) => res.json({ message: 'Hello, world!' }));
-    app.get('/health/ready', (req, res) => {
-        const ready = require('mongoose').connection.readyState === 1;
-        res.status(ready ? 200 : 503).json({ ready });
-    });
-    app.use('/incidents', require('./routes/incidentRoutes'));
-    app.use('/post-mortems', require('./routes/postMortemRoutes'));
-    app.use('/auth', require('./routes/authRoutes'));
-    app.use('/users', require('./routes/userRoutes'));
-    app.use((req, res) =>
-        res.status(404).json({ message: 'Route not found.' })
-    );
-    app.use(errorHandler);
-    return app;
-}
-const app = createApp();
-module.exports = { app, createApp };
+});
+
+/**
+ * Import Routes
+ */
+// incident routes
+const incidentRoutes = require('./routes/incidentRoutes');
+app.use('/incidents', incidentRoutes);
+
+// post-mortem routes
+const postMortemRoutes = require('./routes/postMortemRoutes');
+app.use('/post-mortems', postMortemRoutes);
+
+// auth routes
+const authRoutes = require('./routes/authRoutes');
+app.use('/auth', authRoutes);
+
+// user routes
+const userRoutes = require('./routes/userRoutes');
+app.use('/users', userRoutes);
+
+module.exports = {
+    app,
+};

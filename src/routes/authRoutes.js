@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const verifyTokenMiddleware = require('../middlewares/verifyTokenMiddleware');
-const { validateBody, registrationInput } = require('../utils/inputValidation');
+const passport = require('passport');
 const authController = require('../controllers/authController');
 
 /**
@@ -37,11 +36,7 @@ const authController = require('../controllers/authController');
  *       400:
  *         description: Registration failed due to validation errors.
  */
-router.post(
-    '/register',
-    validateBody(registrationInput),
-    authController.handleRegisterUser
-);
+router.post('/register', authController.handleRegisterUser);
 
 /**
  * @swagger
@@ -100,6 +95,10 @@ router.post('/login', authController.handleLoginUser);
  *       401:
  *         description: Unauthorized. User not authenticated.
  */
-router.get('/logout', verifyTokenMiddleware, authController.handleLogoutUser);
+router.get(
+    '/logout',
+    passport.authenticate('jwt', { session: false }),
+    authController.handleLogoutUser
+);
 
 module.exports = router;
