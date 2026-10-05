@@ -10,7 +10,7 @@ export default [
         languageOptions: { globals: globals.node },
     },
     {
-        files: ['**/*.js'],
+        files: ['**/*.{js,cjs}'],
         languageOptions: {
             sourceType: 'commonjs',
             globals: {
@@ -21,7 +21,7 @@ export default [
     pluginJs.configs.recommended,
     eslintConfigPrettier,
     {
-        files: ['src/tests/**/*.js', '**/*.test.js', '**/*.spec.js'],
+        files: ['src/tests/**/*.{js,cjs}', '**/*.test.js', '**/*.spec.js'],
         languageOptions: { globals: globals.jest },
         plugins: {
             jest: jest,
