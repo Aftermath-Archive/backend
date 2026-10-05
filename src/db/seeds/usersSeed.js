@@ -1,4 +1,5 @@
 const { User } = require('../../models/userModel');
+const bcrypt = require('bcrypt');
 
 async function seedUsers() {
     const users = [
@@ -16,7 +17,14 @@ async function seedUsers() {
         },
     ];
 
-    await User.insertMany(users);
+    await User.insertMany(
+        await Promise.all(
+            users.map(async (user) => ({
+                ...user,
+                password: await bcrypt.hash(user.password, 12),
+            }))
+        )
+    );
     console.log('Users seeded successfully.');
 }
 

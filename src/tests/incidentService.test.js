@@ -1,7 +1,9 @@
 // Mock model to prevent the actual MongoDB connection from being used
 jest.mock('../models/incidentModel');
 jest.mock('../services/postMortemService');
-const { deletePostMortemByIncidentId } = require('../services/postMortemService');
+const {
+    deletePostMortemByIncidentId,
+} = require('../services/postMortemService');
 
 // Import the mocked model for reference
 const { Incident } = require('../models/incidentModel');
@@ -34,7 +36,11 @@ describe('Incident Service', () => {
     });
 
     test('createNewIncidentService creates a new incident', async () => {
-        const mockIncident = { title: 'Test', description: 'Test desc' };
+        const mockIncident = {
+            title: 'Test',
+            description: 'Test desc',
+            environment: 'Production',
+        };
         Incident.create.mockResolvedValue(mockIncident);
 
         const result = await createNewIncidentService(mockIncident);
@@ -59,7 +65,11 @@ describe('Incident Service', () => {
             { title: 'Incident 1' },
             { title: 'Incident 2' },
         ];
-        Incident.find.mockResolvedValue(mockIncidents);
+        Incident.find.mockReturnValue({
+            sort: jest.fn().mockReturnThis(),
+            skip: jest.fn().mockReturnThis(),
+            limit: jest.fn().mockResolvedValue(mockIncidents),
+        });
 
         const result = await findIncidentsByQueryService({ severity: 'High' });
         expect(Incident.find).toHaveBeenCalledWith({ severity: 'High' });
@@ -76,7 +86,7 @@ describe('Incident Service', () => {
         );
         expect(Incident.findOneAndUpdate).toHaveBeenCalledWith(
             { title: 'Incident 1' },
-            { title: 'Updated Incident' },
+            { $set: { title: 'Updated Incident' } },
             { new: true, runValidators: true }
         );
         expect(result).toEqual(mockUpdatedIncident);
@@ -93,7 +103,9 @@ describe('Incident Service', () => {
             title: 'Deleted Incident',
         });
         expect(result).toEqual(mockIncident);
-        expect(deletePostMortemByIncidentId).toHaveBeenCalledWith('incident-id');
+        expect(deletePostMortemByIncidentId).toHaveBeenCalledWith(
+            'incident-id'
+        );
     });
 
     test('deleting an absent incident does not delete a post-mortem', async () => {
@@ -104,7 +116,7 @@ describe('Incident Service', () => {
         try {
             await expect(
                 deleteIncidentByQueryService({ _id: 'missing-id' })
-            ).rejects.toThrow('No incident found to delete.');
+            ).rejects.toThrow('Incident not found.');
             expect(deletePostMortemByIncidentId).not.toHaveBeenCalled();
         } finally {
             consoleError.mockRestore();

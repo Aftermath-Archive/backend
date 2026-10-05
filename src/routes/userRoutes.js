@@ -1,19 +1,27 @@
 const express = require('express');
 const router = express.Router();
 
-const validateUserExistsMiddleware = require('../middlewares/validateUserExistsMiddleware');
+const verifyTokenMiddleware = require('../middlewares/verifyTokenMiddleware');
+const validateObjectIdMiddleware = require('../middlewares/validateObjectIdMiddleware');
+const {
+    requireAdmin,
+    requireSelfOrAdmin,
+} = require('../middlewares/authorizationMiddleware');
+const { validateBody, userUpdateInput } = require('../utils/inputValidation');
+router.use(verifyTokenMiddleware);
 
 const userController = require('../controllers/userController');
 const paginationMiddleware = require('../middlewares/paginationMiddleware');
-
 
 /**
  * @swagger
  * /users:
  *   get:
  *     summary: Get all users
- *     description: Fetch a paginated list of all users.
+ *     description: Admin-only account directory with safe responses and bounded pagination.
  *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: query
  *         name: page
@@ -31,15 +39,22 @@ const paginationMiddleware = require('../middlewares/paginationMiddleware');
  *       400:
  *         description: Bad request.
  */
-router.get('/', paginationMiddleware, userController.handleGetAllUsers);
+router.get(
+    '/',
+    requireAdmin,
+    paginationMiddleware,
+    userController.handleGetAllUsers
+);
 
 /**
  * @swagger
  * /users/{id}:
  *   get:
  *     summary: Get a user by ID
- *     description: Retrieve a user by their unique ID.
+ *     description: Requires login. Self/admin receive safe account fields; other members receive display profile fields only.
  *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -57,7 +72,7 @@ router.get('/', paginationMiddleware, userController.handleGetAllUsers);
  */
 router.get(
     '/:id',
-    validateUserExistsMiddleware,
+    validateObjectIdMiddleware,
     userController.handleGetUserById
 );
 
@@ -66,8 +81,10 @@ router.get(
  * /users/{id}:
  *   patch:
  *     summary: Update a user by ID
- *     description: Update a user's information by their unique ID.
+ *     description: Self or admin may edit username, email and profile. Password changes require the current password and are self-only; role and lifecycle fields cannot be changed.
  *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -92,7 +109,10 @@ router.get(
  *               password:
  *                 type: string
  *                 format: password
- *                 description: Updated password.
+ *                 description: New password; requires currentPassword on your own account.
+ *               currentPassword:
+ *                 type: string
+ *                 format: password
  *     responses:
  *       200:
  *         description: User updated successfully.
@@ -104,7 +124,9 @@ router.get(
 
 router.patch(
     '/:id',
-    validateUserExistsMiddleware,
+    validateObjectIdMiddleware,
+    requireSelfOrAdmin,
+    validateBody(userUpdateInput),
     userController.handleUpdateUser
 );
 
@@ -113,8 +135,10 @@ router.patch(
  * /users/{id}:
  *   delete:
  *     summary: Delete a user by ID
- *     description: Soft delete a user by marking them as inactive.
+ *     description: Self or admin may deactivate an account. Tokens are immediately invalidated.
  *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -132,7 +156,8 @@ router.patch(
  */
 router.delete(
     '/:id',
-    validateUserExistsMiddleware,
+    validateObjectIdMiddleware,
+    requireSelfOrAdmin,
     userController.handleDeleteUser
 );
 

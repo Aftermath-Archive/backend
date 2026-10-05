@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const postMortemController = require('../controllers/postMortemController');
 const verifyTokenMiddleware = require('../middlewares/verifyTokenMiddleware');
+const { requireAdmin } = require('../middlewares/authorizationMiddleware');
 const validateObjectIdMiddleware = require('../middlewares/validateObjectIdMiddleware');
 const paginationMiddleware = require('../middlewares/paginationMiddleware');
 const {
@@ -384,7 +385,7 @@ router.get(
  *         $ref: '#/components/responses/PostMortemServerError'
  *   delete:
  *     summary: Delete a post-mortem
- *     description: Returns the deleted report and leaves its incident intact. Any authenticated user can delete a report.
+ *     description: Returns the deleted report and leaves its incident intact. Only admins can delete a report.
  *     tags: [Post-mortems]
  *     security:
  *       - bearerAuth: []
@@ -417,6 +418,7 @@ router.patch(
 router.delete(
     '/:id',
     verifyTokenMiddleware,
+    requireAdmin,
     validateObjectIdMiddleware,
     postMortemController.handleDeletePostMortem
 );
